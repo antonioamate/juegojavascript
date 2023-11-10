@@ -21,6 +21,7 @@ onload = () => {
     sharedContext,
   });
   
+  
   function animation() {
     //limpiar el canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
