@@ -8,28 +8,21 @@ onload = () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   const keys = new Keys();
+  const background = new Background({ position: { x: 0, y: 0 }, keys, sharedContext, player: null });
+  const player = new Player({ position: { x: 50, y: 50 }, keys, sharedContext, background: null });
+  background.player = player;
+  player.background = background;
 
-  const background = new Background({
-    position: { x: 0, y: 0 },
-    keys,
-    sharedContext,
-  });
-  
-  const player = new Player({
-    position: { x: 50, y: 50 },
-    keys,
-    sharedContext,
-  });
-  
-  
+  // Establecer la referencia cruzada
+
   function animation() {
     //limpiar el canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    console.table(keys)
+    console.table(keys);
 
     background.update();
     player.update();
-    
+
     background.draw(ctx);
     player.draw(ctx);
   }
@@ -113,4 +106,3 @@ onload = () => {
     animate(); // Iniciar la animación
   };
 };
-
