@@ -1,62 +1,34 @@
 onload = () => {
   const canvas = document.getElementById("canvas");
-  var ctx = canvas.getContext("2d");
-  const sharedContext = {
-    ctx: ctx,
-  };
+  const ctx = canvas.getContext("2d");
+  const backgroundImage = new Image();
+  backgroundImage.src = "./img/forest.jpg";
 
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  const keys = new Keys();
-  const background = new Background({ position: { x: 0, y: 0 }, keys, sharedContext });
-  const player = new Player({ position: { x: 50, y: 50 }, keys, sharedContext, background });
-  
+  ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
-  // Establecer la referencia cruzada
+  const player = new Player({ position: { x: 50, y: 50 }, ctx });
 
   function animation() {
     //limpiar el canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    console.log(player.position.x)
-    console.log(player.position.y)
-    background.update();
     player.update();
-    background.draw(ctx);
-    player.draw(ctx);
+    player.draw();
   }
 
   addEventListener("keydown", (e) => {
     switch (e.key) {
       case "w":
-        keys.w = true;
+        player.keys.w = true;
         break;
       case "a":
-        keys.a = true;
+        player.keys.a = true;
         break;
       case "s":
-        keys.s = true;
+        player.keys.s = true;
         break;
       case "d":
-        keys.d = true;
-        break;
-      case "ArrowUp":
-        keys.arrowUp = true;
-        break;
-      case "ArrowDown":
-        keys.arrowDown = true;
-        break;
-      case "ArrowLeft":
-        keys.arrowLeft = true;
-        break;
-      case "ArrowRight":
-        keys.arrowRight = true;
-        break;
-      case "+":
-        keys.zoomIn = true;
-        break;
-      case "-":
-        keys.zoomOut = true;
+        player.keys.d = true;
         break;
     }
   });
@@ -64,44 +36,168 @@ onload = () => {
   addEventListener("keyup", (e) => {
     switch (e.key) {
       case "w":
-        keys.w = false;
+        player.keys.w = false;
         break;
       case "a":
-        keys.a = false;
+        player.keys.a = false;
         break;
       case "s":
-        keys.s = false;
+        player.keys.s = false;
         break;
       case "d":
-        keys.d = false;
-        break;
-      case "ArrowUp":
-        keys.arrowUp = false;
-        break;
-      case "ArrowDown":
-        keys.arrowDown = false;
-        break;
-      case "ArrowLeft":
-        keys.arrowLeft = false;
-        break;
-      case "ArrowRight":
-        keys.arrowRight = false;
-        break;
-      case "+":
-        keys.zoomIn = false;
-        break;
-      case "-":
-        keys.zoomOut = false;
+        player.keys.d = false;
         break;
     }
   });
-  background.image.onload = () => {
-    // Usar requestAnimationFrame para la animación en lugar de setInterval
+  backgroundImage.onload = () => {
     function animate() {
       animation();
       requestAnimationFrame(animate);
     }
-
-    animate(); // Iniciar la animación
+    animate();
   };
 };
+
+class Player {
+  constructor({ position, ctx }) {
+    this.position = position;
+    this.ctx = ctx;
+    this.keys = {
+      w: false,
+      a: false,
+      s: false,
+      d: false,
+    };
+    this.image = new Image();
+    this.image.src = "./img/spritestick.png";
+    this.acceleration = 6;
+    this.speed = {
+      x: 0,
+      y: 0,
+    };
+    this.size = {
+      width: 200,
+      height: 250,
+    };
+    this.jumpStrength = 25;
+    this.gravity = 1;
+    this.animation = 2;
+    this.frame = 0;
+    this.slowFrame = 0;
+    this.covered = false;
+    this.onGround = false;
+    this.facingRight = true;
+  }
+  draw() {
+    this.ctx.fillStyle = "rgba(255, 0, 0,.5)";
+    this.ctx.fillRect(this.position.x, this.position.y, 200, 250);
+    this.ctx.drawImage(
+      this.image,
+      this.frame * 200, //por donde empieza a recortar la imagen
+      this.animation * 250,
+      200, //lo que recorta de la imagen fuente
+      250,
+      this.position.x,
+      this.position.y,
+      200,
+      250
+    );
+  }
+
+  update() {
+    this.nextFrame();
+    this.speed.x = 0;
+    this.animation = 2;
+
+    if (this.facingRight) {
+      this.idleRight();
+    } else {
+      this.idleLeft();
+    }
+    if (this.keys.a) {
+      this.speed.x -= this.acceleration;
+      this.walkLeft();
+      this.facingRight = false;
+    }
+    if (this.keys.d) {
+      this.speed.x += this.acceleration;
+      this.walkRight();
+      this.facingRight = true;
+    }
+    if (this.keys.s) {
+      this.speed.x = 0;
+      if (this.facingRight) {
+        this.coverRight();
+      } else {
+        this.coverLeft();
+      }
+    }
+    if (this.keys.w) {
+      if (this.animation == 4) {
+        this.animation = 3;
+      } else if(this.animation==5) {
+        this.animation = 2;
+      }
+      
+      this.jump();
+    }
+
+    //actualizar posición
+    this.speed.y += this.gravity;
+    if (this.position.y + this.speed.y > 470) {
+      this.position.y = 470;
+      this.speed.y = 0;
+      this.onGround = true;
+    }
+    this.position.y += this.speed.y;
+    this.position.x += this.speed.x;
+  }
+  jump() {
+    if (this.onGround) {
+      this.speed.y -= this.jumpStrength;
+      this.onGround = false;
+    }
+  }
+  walkLeft() {
+    if (this.animation !== 0) {
+      this.animation = 0;
+    }
+  }
+  walkRight() {
+    if (this.animation !== 1) {
+      this.animation = 1;
+    }
+  }
+  idleRight() {
+    if (this.animation !== 2) {
+      this.animation = 2;
+    }
+  }
+  idleLeft() {
+    if (this.animation !== 3) {
+      this.animation = 3;
+    }
+  }
+  coverLeft() {
+    if (this.animation !== 4) {
+      this.animation = 4;
+    }
+  }
+  coverRight() {
+    if (this.animation !== 5) {
+      this.animation = 5;
+    }
+  }
+  nextFrame() {
+    if (this.slowFrame > 8) {
+      if (this.frame < 7) {
+        this.frame++;
+      } else {
+        this.frame = 0;
+      }
+      this.slowFrame = 0;
+    } else {
+      this.slowFrame++;
+    }
+  }
+}
