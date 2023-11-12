@@ -14,6 +14,8 @@ onload = () => {
       player.update();
 
       player.draw();
+      player.updateProjectiles();
+      player.drawProjectiles();
     }
 
     addEventListener("keydown", (e) => {
@@ -49,6 +51,12 @@ onload = () => {
           break;
       }
     });
+    addEventListener("mousedown", (e) => {
+      player.keys.click = true;
+    });
+    addEventListener("mouseup", (e) => {
+      player.keys.click = false;
+    });
     canvas.addEventListener("mousemove", function (event) {
       player.aim.x = event.clientX - canvas.getBoundingClientRect().left;
       player.aim.y = event.clientY - canvas.getBoundingClientRect().top;
@@ -74,6 +82,7 @@ class Player {
       a: false,
       s: false,
       d: false,
+      click: false,
     };
     this.image = new Image();
     this.image.src = "./img/spritestick.png";
@@ -94,12 +103,14 @@ class Player {
     this.covered = false;
     this.onGround = false;
     this.facingRight = true;
+    this.projectiles = [];
+    this.slowFrameShoot = 0;
+    this.fireRate = 10;
     this.aim = {
       x: 170,
       y: 600,
     };
     this.arm = {
-      deg: 0,
       length: 48,
       start: {
         x: 0,
@@ -144,8 +155,13 @@ class Player {
 
   update() {
     this.nextFrame();
-    this.speed.x = 0;
+    this.nextFrameShoot();
     this.idleRight();
+    this.speed.x = 0;
+    if (this.canShoot && this.keys.click) {
+      this.canShoot = false;
+      this.shoot();
+    }
     if (this.aim.x < this.position.x + 60) {
       this.facingRight = false;
     } else {
@@ -201,9 +217,9 @@ class Player {
       this.speed.x = 0;
       this.position.x = 0;
     }
-    if (this.position.x + this.size.x + this.speed.x > 1280) {
+    if (this.position.x + this.size.x + this.speed.x > 1200) {
       this.speed.x = 0;
-      this.position.x = 1280 - this.size.x;
+      this.position.x = 1200 - this.size.x;
     }
     this.position.y += this.speed.y;
     this.position.x += this.speed.x;
@@ -266,6 +282,14 @@ class Player {
       this.slowFrame++;
     }
   }
+  nextFrameShoot() {
+    if (this.slowFrameShoot > this.fireRate) {
+      this.canShoot = true;
+      this.slowFrameShoot = 0
+    } else {
+      this.slowFrameShoot++;
+    }
+  }
   getArmDimensions() {
     //calcula el inicio y el fin del brazo a partir del offset, el frame,
     //las coordenadas del ratón, y la posición del jugador
@@ -291,4 +315,55 @@ class Player {
     this.arm.end.x = startX + normalizedDx * this.arm.length;
     this.arm.end.y = startY + normalizedDy * this.arm.length;
   }
+  shoot() {
+    const projectile = new Projectile({
+      startX: this.arm.end.x,
+      startY: this.arm.end.y,
+      targetX: this.aim.x,
+      targetY: this.aim.y,
+      ctx: this.ctx,
+    });
+
+    this.projectiles.push(projectile);
+  }
+
+  drawProjectiles() {
+    for (const projectile of this.projectiles) {
+      projectile.draw();
+    }
+  }
+
+  updateProjectiles() {
+    for (const projectile of this.projectiles) {
+      projectile.update();
+    }
+    // Filtra los proyectiles que ya no están en pantalla
+    this.projectiles = this.projectiles.filter((projectile) => projectile.position.x > 0 && projectile.position.x < canvas.width && projectile.position.y > 0 && projectile.position.y < canvas.height);
+  }
+}
+class Projectile {
+  constructor({ startX, startY, targetX, targetY, ctx }) {
+    this.position = { x: startX, y: startY };
+    this.target = { x: targetX, y: targetY };
+    this.ctx = ctx;
+    this.speed = 10;
+    this.width = 10
+    this.height = 2   
+    this.angle=Math.atan2(this.target.y - this.position.y, this.target.x - this.position.x)
+  }
+
+  draw() {
+    this.ctx.fillStyle="yellow"
+    this.ctx.save();
+    this.ctx.translate(this.position.x + this.width / 2, this.position.y + this.height / 2);
+    this.ctx.rotate(this.angle);
+    this.ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+    this.ctx.restore();
+  }
+
+  update() {
+    this.position.x += this.speed * Math.cos(this.angle);
+    this.position.y += this.speed * Math.sin(this.angle);
+  }
+  // No necesitas una condición 'else' aquí, para permitir que el proyectil continúe fuera de la pantalla
 }
