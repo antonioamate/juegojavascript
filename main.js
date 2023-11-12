@@ -13,8 +13,6 @@ onload = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
-      console.log("onGround "+player.onGround)
-      
       player.update();
 
       player.draw();
@@ -53,6 +51,15 @@ onload = () => {
           break;
       }
     });
+    canvas.addEventListener("mousemove", function (event) {
+      player.aim.x = event.clientX - canvas.getBoundingClientRect().left;
+      player.aim.y = event.clientY - canvas.getBoundingClientRect().top;
+
+      // Hacer algo con las coordenadas (por ejemplo, mostrarlas en la consola)
+      console.log("Coordenadas del cursor: x=" + player.aim.x + ", y=" + player.aim.y);
+    });
+
+    canvas.style.cursor = "url('./img/aim_red.cur'), auto";
 
     function animate() {
       animation();
@@ -95,6 +102,10 @@ class Player {
     this.covered = false;
     this.onGround = false;
     this.facingRight = true;
+    this.aim = {
+      x: 300,
+      y: 300,
+    };
   }
   draw() {
     /* this.ctx.fillStyle = "rgba(255, 0, 0,.5)";
@@ -116,7 +127,11 @@ class Player {
     this.nextFrame();
     this.speed.x = 0;
     this.animation = 2;
-
+    if(this.aim.x<this.position.x+60){
+      this.facingRight=false
+    }else{
+      this.facingRight=true
+    }
     if (this.facingRight) {
       this.idleRight();
     } else {
@@ -124,20 +139,28 @@ class Player {
     }
     if (this.keys.a) {
       this.speed.x -= this.acceleration;
-      this.walkLeft();
-      this.facingRight = false;
+      if(this.facingRight){
+        this.backLeft()
+      }else{
+        this.walkLeft();
+      }
     }
     if (this.keys.d) {
       this.speed.x += this.acceleration;
-      this.walkRight();
-      this.facingRight = true;
+      if(this.facingRight){
+        this.walkRight();
+      }else{
+        this.backRight()
+      }
     }
     if (this.keys.s) {
-      this.speed.x = 0;
-      if (this.facingRight) {
-        this.coverRight();
-      } else {
-        this.coverLeft();
+      if (this.onGround) {
+        this.speed.x = 0;
+        if (this.facingRight) {
+          this.coverRight();
+        } else {
+          this.coverLeft();
+        }
       }
     }
     if (this.keys.w) {
@@ -202,6 +225,16 @@ class Player {
   coverRight() {
     if (this.animation !== 5) {
       this.animation = 5;
+    }
+  }
+  backLeft() {
+    if (this.animation !== 6) {
+      this.animation = 6;
+    }
+  }
+  backRight() {
+    if (this.animation !== 7) {
+      this.animation = 7;
     }
   }
   nextFrame() {
