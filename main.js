@@ -5,8 +5,6 @@ onload = () => {
   backgroundImage.src = "./img/forest.jpg";
 
   backgroundImage.onload = () => {
-    // Draw the background image when it's loaded
-
     const player = new Player({ position: { x: 50, y: 50 }, ctx });
 
     function animation() {
@@ -54,9 +52,6 @@ onload = () => {
     canvas.addEventListener("mousemove", function (event) {
       player.aim.x = event.clientX - canvas.getBoundingClientRect().left;
       player.aim.y = event.clientY - canvas.getBoundingClientRect().top;
-
-      // Hacer algo con las coordenadas (por ejemplo, mostrarlas en la consola)
-      console.log("Coordenadas del cursor: x=" + player.aim.x + ", y=" + player.aim.y);
     });
 
     canvas.style.cursor = "url('./img/aim_red.cur'), auto";
@@ -66,12 +61,9 @@ onload = () => {
       requestAnimationFrame(animate);
     }
 
-    // Start the animation loop
     animate();
   };
 };
-
-// The rest of your Player class remains unchanged
 
 class Player {
   constructor({ position, ctx }) {
@@ -103,8 +95,8 @@ class Player {
     this.onGround = false;
     this.facingRight = true;
     this.aim = {
-      x: 300,
-      y: 300,
+      x: 170,
+      y: 600,
     };
     this.arm = {
       deg: 0,
@@ -124,12 +116,9 @@ class Player {
       },
     };
   }
-  getArmDimensions() {
-    this.arm.start.y = this.position.y + this.arm.offset.y;
-    this.arm.start.x = this.position.x + this.arm.offset.x;
-  }
+
   draw() {
-    /* this.ctx.fillStyle = "rgba(255, 0, 0,.5)";
+    /* this.ctx.fillStyle = "rgba(255, 0, 0,0.5)";
     this.ctx.fillRect(this.position.x, this.position.y, 100, 125); */
     this.ctx.drawImage(
       this.image,
@@ -143,33 +132,20 @@ class Player {
       125
     );
     this.getArmDimensions();
-    let startX = this.arm.start.x;
-    let endX = this.aim.x;
-    let startY = this.arm.start.y;
-    let endY = this.aim.y;
-    let dx = endX - startX;
-    let dy = endY - startY;
-    let length = Math.sqrt(dx * dx + dy * dy);
 
-    let normalizedDx = dx / length;
-    let normalizedDy = dy / length;
-
-    let newEndX = startX + normalizedDx * this.arm.length;
-    let newEndY = startY + normalizedDy * this.arm.length;
+    //dibujar el brazo
     this.ctx.lineWidth = this.arm.width;
-
     this.ctx.lineCap = "round";
-
     this.ctx.beginPath();
-    this.ctx.moveTo(startX, startY);
-    this.ctx.lineTo(newEndX, newEndY);
+    this.ctx.moveTo(this.arm.start.x, this.arm.start.y);
+    this.ctx.lineTo(this.arm.end.x, this.arm.end.y);
     this.ctx.stroke();
   }
 
   update() {
     this.nextFrame();
     this.speed.x = 0;
-    this.idleRight()
+    this.idleRight();
     if (this.aim.x < this.position.x + 60) {
       this.facingRight = false;
     } else {
@@ -196,14 +172,12 @@ class Player {
         this.backRight();
       }
     }
-    if (this.keys.s) {
-      if (this.onGround) {
-        this.speed.x = 0;
-        if (this.facingRight) {
-          this.coverRight();
-        } else {
-          this.coverLeft();
-        }
+    if (this.keys.s && this.onGround) {
+      this.speed.x = 0;
+      if (this.facingRight) {
+        this.coverRight();
+      } else {
+        this.coverLeft();
       }
     }
     if (this.keys.w) {
@@ -227,9 +201,9 @@ class Player {
       this.speed.x = 0;
       this.position.x = 0;
     }
-    if (this.position.x + this.speed.x < 0) {
+    if (this.position.x + this.size.x + this.speed.x > 1280) {
       this.speed.x = 0;
-      this.position.x = 0;
+      this.position.x = 1280 - this.size.x;
     }
     this.position.y += this.speed.y;
     this.position.x += this.speed.x;
@@ -241,60 +215,44 @@ class Player {
     }
   }
   walkLeft() {
-    if (this.animation !== 0) {
-      this.animation = 0;
-      this.arm.offset.x = 19;
-      this.arm.offset.y = 23;
-    }
+    this.animation = 0;
+    this.arm.offset.x = 19;
+    this.arm.offset.y = 23;
   }
   walkRight() {
-    if (this.animation !== 1) {
-      this.animation = 1;
-      this.arm.offset.x = 81;
-      this.arm.offset.y = 23;
-    }
+    this.animation = 1;
+    this.arm.offset.x = 81;
+    this.arm.offset.y = 23;
   }
   idleRight() {
-    if (this.animation !== 2) {
-      this.animation = 2;
-      this.arm.offset.x = 67;
-      this.arm.offset.y = 28;
-    }
+    this.animation = 2;
+    this.arm.offset.x = 67;
+    this.arm.offset.y = 28;
   }
   idleLeft() {
-    if (this.animation !== 3) {
-      this.animation = 3;
-      this.arm.offset.x = 60;
-      this.arm.offset.y = 28;
-    }
+    this.animation = 3;
+    this.arm.offset.x = 60;
+    this.arm.offset.y = 28;
   }
   coverLeft() {
-    if (this.animation !== 4) {
-      this.animation = 4;
-      this.arm.offset.x = 70;
-      this.arm.offset.y = 64;
-    }
+    this.animation = 4;
+    this.arm.offset.x = 70;
+    this.arm.offset.y = 64;
   }
   coverRight() {
-    if (this.animation !== 5) {
-      this.animation = 5;
-      this.arm.offset.x = 49;
-      this.arm.offset.y = 64;
-    }
+    this.animation = 5;
+    this.arm.offset.x = 49;
+    this.arm.offset.y = 64;
   }
   backLeft() {
-    if (this.animation !== 6) {
-      this.animation = 6;
-      this.arm.offset.x = 81;
-      this.arm.offset.y = 23;
-    }
+    this.animation = 6;
+    this.arm.offset.x = 81;
+    this.arm.offset.y = 23;
   }
   backRight() {
-    if (this.animation !== 7) {
-      this.animation = 7;
-      this.arm.offset.x = 19;
-      this.arm.offset.y = 23;
-    }
+    this.animation = 7;
+    this.arm.offset.x = 19;
+    this.arm.offset.y = 23;
   }
   nextFrame() {
     if (this.slowFrame > 8) {
@@ -307,5 +265,30 @@ class Player {
     } else {
       this.slowFrame++;
     }
+  }
+  getArmDimensions() {
+    //calcula el inicio y el fin del brazo a partir del offset, el frame,
+    //las coordenadas del ratón, y la posición del jugador
+    //calcular inicio brazo
+    if (this.frame < 5) {
+      this.arm.start.y = this.position.y + this.arm.offset.y + this.frame - 0.5;
+    } else {
+      this.arm.start.y = this.position.y + this.arm.offset.y + 7 - this.frame - 0.5;
+    }
+    this.arm.start.x = this.position.x + this.arm.offset.x;
+    //calcular final brazo
+    let startX = this.arm.start.x;
+    let endX = this.aim.x;
+    let startY = this.arm.start.y;
+    let endY = this.aim.y;
+    let dx = endX - startX;
+    let dy = endY - startY;
+    let length = Math.sqrt(dx * dx + dy * dy);
+
+    let normalizedDx = dx / length;
+    let normalizedDy = dy / length;
+
+    this.arm.end.x = startX + normalizedDx * this.arm.length;
+    this.arm.end.y = startY + normalizedDy * this.arm.length;
   }
 }
