@@ -75,6 +75,29 @@ onload = () => {
 
 class Player {
   constructor({ position, ctx }) {
+    this.pistol = {
+      position: {
+        x: 300,
+        y: 300,
+      },
+      image: new Image(),
+      size: {
+        width: 80,
+        height: 48,
+      },
+      frame: 0,
+      facingRight: true,
+      shooting: false,
+      start: {
+        x: 0,
+        y: 0,
+      },
+      end: {
+        x: 0,
+        y: 0,
+      },
+    };
+    this.pistol.image.src = "./img/pistol.png";
     this.position = position;
     this.ctx = ctx;
     this.keys = {
@@ -86,6 +109,7 @@ class Player {
     };
     this.image = new Image();
     this.image.src = "./img/spritestick.png";
+
     this.speed = {
       x: 0,
       y: 0,
@@ -94,6 +118,7 @@ class Player {
       width: 100,
       height: 125,
     };
+    this.alternate = 0;
     this.acceleration = 3;
     this.jumpStrength = 12;
     this.gravity = 0.3;
@@ -105,7 +130,7 @@ class Player {
     this.facingRight = true;
     this.projectiles = [];
     this.slowFrameShoot = 0;
-    this.fireRate = 10;
+    this.fireRate = 20;
     this.aim = {
       x: 170,
       y: 600,
@@ -125,6 +150,7 @@ class Player {
         x: 0,
         y: 0,
       },
+      angle: 0,
     };
   }
 
@@ -144,6 +170,8 @@ class Player {
     );
     this.getArmDimensions();
 
+    this.pistol.position = { x: this.arm.end.x , y: this.arm.end.y };
+
     //dibujar el brazo
     this.ctx.lineWidth = this.arm.width;
     this.ctx.lineCap = "round";
@@ -151,16 +179,55 @@ class Player {
     this.ctx.moveTo(this.arm.start.x, this.arm.start.y);
     this.ctx.lineTo(this.arm.end.x, this.arm.end.y);
     this.ctx.stroke();
-  }
+    //dibujar la pistola
+    this.ctx.save();
+    var offsetX = -40;
+    var offsetY = -2;
+    this.ctx.translate(this.pistol.position.x, this.pistol.position.y);
+    this.ctx.translate((80 * this.pistol.frame) / 2 -offsetX, 48 / 2); // Trasladar al centro de la pistola
+    this.ctx.rotate(this.arm.angle);
+    this.ctx.fillRect(-80 / 2, -48 / 2, 80, 48); // Dibujar la pistola desde el centro
+    this.ctx.drawImage(
+      this.pistol.image,
+      80 * this.pistol.frame, //inicio x
+      0, //inicio y
+      80,
+      48,
+      -80 / 2 -offsetX,
+      -48 / 2 -offsetY ,
+      80, //dimensiones de la imagen final
+      48
+    );
 
+    // Restablecer el contexto al estado guardado
+    this.ctx.restore();
+  }
+  nextFramePistol() {
+    if (this.alternate > 0) {
+      if (this.pistol.shooting) {
+        if (this.pistol.frame > 9) {
+          this.pistol.frame = 0;
+          this.pistol.shooting = false;
+        } else {
+          this.pistol.frame++;
+        }
+      }
+      this.alternate = 0;
+    } else {
+      this.alternate++;
+    }
+  }
   update() {
     this.nextFrame();
     this.nextFrameShoot();
+    this.nextFramePistol();
     this.idleRight();
     this.speed.x = 0;
     if (this.canShoot && this.keys.click) {
-      this.canShoot = false;
       this.shoot();
+      this.canShoot = false;
+      this.slowFrameShoot = 0;
+      this.pistol.shooting = true;
     }
     if (this.aim.x < this.position.x + 60) {
       this.facingRight = false;
@@ -285,11 +352,12 @@ class Player {
   nextFrameShoot() {
     if (this.slowFrameShoot > this.fireRate) {
       this.canShoot = true;
-      this.slowFrameShoot = 0
+      this.slowFrameShoot = 0;
     } else {
       this.slowFrameShoot++;
     }
   }
+
   getArmDimensions() {
     //calcula el inicio y el fin del brazo a partir del offset, el frame,
     //las coordenadas del ratón, y la posición del jugador
@@ -314,8 +382,11 @@ class Player {
 
     this.arm.end.x = startX + normalizedDx * this.arm.length;
     this.arm.end.y = startY + normalizedDy * this.arm.length;
+    this.arm.angle = Math.atan2(dy, dx);
   }
   shoot() {
+    const audio = new Audio("./sounds/pistolShotCut.mp3");
+    audio.play();
     const projectile = new Projectile({
       startX: this.arm.end.x,
       startY: this.arm.end.y,
@@ -347,13 +418,13 @@ class Projectile {
     this.target = { x: targetX, y: targetY };
     this.ctx = ctx;
     this.speed = 10;
-    this.width = 10
-    this.height = 2   
-    this.angle=Math.atan2(this.target.y - this.position.y, this.target.x - this.position.x)
+    this.width = 10;
+    this.height = 2;
+    this.angle = Math.atan2(this.target.y - this.position.y, this.target.x - this.position.x);
   }
 
   draw() {
-    this.ctx.fillStyle="yellow"
+    this.ctx.fillStyle = "yellow";
     this.ctx.save();
     this.ctx.translate(this.position.x + this.width / 2, this.position.y + this.height / 2);
     this.ctx.rotate(this.angle);
@@ -365,5 +436,4 @@ class Projectile {
     this.position.x += this.speed * Math.cos(this.angle);
     this.position.y += this.speed * Math.sin(this.angle);
   }
-  // No necesitas una condición 'else' aquí, para permitir que el proyectil continúe fuera de la pantalla
 }
