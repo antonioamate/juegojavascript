@@ -106,6 +106,27 @@ class Player {
       x: 300,
       y: 300,
     };
+    this.arm = {
+      deg: 0,
+      length: 48,
+      start: {
+        x: 0,
+        y: 0,
+      },
+      end: {
+        x: 0,
+        y: 0,
+      },
+      width: 3.5,
+      offset: {
+        x: 0,
+        y: 0,
+      },
+    };
+  }
+  getArmDimensions() {
+    this.arm.start.y = this.position.y + this.arm.offset.y;
+    this.arm.start.x = this.position.x + this.arm.offset.x;
   }
   draw() {
     /* this.ctx.fillStyle = "rgba(255, 0, 0,.5)";
@@ -121,16 +142,38 @@ class Player {
       100,
       125
     );
+    this.getArmDimensions();
+    let startX = this.arm.start.x;
+    let endX = this.aim.x;
+    let startY = this.arm.start.y;
+    let endY = this.aim.y;
+    let dx = endX - startX;
+    let dy = endY - startY;
+    let length = Math.sqrt(dx * dx + dy * dy);
+
+    let normalizedDx = dx / length;
+    let normalizedDy = dy / length;
+
+    let newEndX = startX + normalizedDx * this.arm.length;
+    let newEndY = startY + normalizedDy * this.arm.length;
+    this.ctx.lineWidth = this.arm.width;
+
+    this.ctx.lineCap = "round";
+
+    this.ctx.beginPath();
+    this.ctx.moveTo(startX, startY);
+    this.ctx.lineTo(newEndX, newEndY);
+    this.ctx.stroke();
   }
 
   update() {
     this.nextFrame();
     this.speed.x = 0;
-    this.animation = 2;
-    if(this.aim.x<this.position.x+60){
-      this.facingRight=false
-    }else{
-      this.facingRight=true
+    this.idleRight()
+    if (this.aim.x < this.position.x + 60) {
+      this.facingRight = false;
+    } else {
+      this.facingRight = true;
     }
     if (this.facingRight) {
       this.idleRight();
@@ -139,18 +182,18 @@ class Player {
     }
     if (this.keys.a) {
       this.speed.x -= this.acceleration;
-      if(this.facingRight){
-        this.backLeft()
-      }else{
+      if (this.facingRight) {
+        this.backLeft();
+      } else {
         this.walkLeft();
       }
     }
     if (this.keys.d) {
       this.speed.x += this.acceleration;
-      if(this.facingRight){
+      if (this.facingRight) {
         this.walkRight();
-      }else{
-        this.backRight()
+      } else {
+        this.backRight();
       }
     }
     if (this.keys.s) {
@@ -200,41 +243,57 @@ class Player {
   walkLeft() {
     if (this.animation !== 0) {
       this.animation = 0;
+      this.arm.offset.x = 19;
+      this.arm.offset.y = 23;
     }
   }
   walkRight() {
     if (this.animation !== 1) {
       this.animation = 1;
+      this.arm.offset.x = 81;
+      this.arm.offset.y = 23;
     }
   }
   idleRight() {
     if (this.animation !== 2) {
       this.animation = 2;
+      this.arm.offset.x = 67;
+      this.arm.offset.y = 28;
     }
   }
   idleLeft() {
     if (this.animation !== 3) {
       this.animation = 3;
+      this.arm.offset.x = 60;
+      this.arm.offset.y = 28;
     }
   }
   coverLeft() {
     if (this.animation !== 4) {
       this.animation = 4;
+      this.arm.offset.x = 70;
+      this.arm.offset.y = 64;
     }
   }
   coverRight() {
     if (this.animation !== 5) {
       this.animation = 5;
+      this.arm.offset.x = 49;
+      this.arm.offset.y = 64;
     }
   }
   backLeft() {
     if (this.animation !== 6) {
       this.animation = 6;
+      this.arm.offset.x = 81;
+      this.arm.offset.y = 23;
     }
   }
   backRight() {
     if (this.animation !== 7) {
       this.animation = 7;
+      this.arm.offset.x = 19;
+      this.arm.offset.y = 23;
     }
   }
   nextFrame() {
