@@ -183,6 +183,9 @@ class Player {
 
     // Guardar el estado actual del contexto
     this.ctx.save();
+    let flip;
+    if (this.arm.angle)
+    console.log(this.arm.angle*Math.PI)
 
     this.ctx.translate(this.arm.end.x, this.arm.end.y);
     this.ctx.rotate(this.arm.angle);
