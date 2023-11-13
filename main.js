@@ -170,7 +170,7 @@ class Player {
     );
     this.getArmDimensions();
 
-    this.pistol.position = { x: this.arm.end.x , y: this.arm.end.y };
+    this.pistol.position = { x: this.arm.end.x, y: this.arm.end.y };
 
     //dibujar el brazo
     this.ctx.lineWidth = this.arm.width;
@@ -180,24 +180,26 @@ class Player {
     this.ctx.lineTo(this.arm.end.x, this.arm.end.y);
     this.ctx.stroke();
     //dibujar la pistola
+
+    // Guardar el estado actual del contexto
     this.ctx.save();
-    var offsetX = -40;
-    var offsetY = -2;
-    this.ctx.translate(this.pistol.position.x, this.pistol.position.y);
-    this.ctx.translate((80 * this.pistol.frame) / 2 -offsetX, 48 / 2); // Trasladar al centro de la pistola
+
+    this.ctx.translate(this.arm.end.x, this.arm.end.y);
     this.ctx.rotate(this.arm.angle);
-    this.ctx.fillRect(-80 / 2, -48 / 2, 80, 48); // Dibujar la pistola desde el centro
     this.ctx.drawImage(
       this.pistol.image,
       80 * this.pistol.frame, //inicio x
       0, //inicio y
-      80,
-      48,
-      -80 / 2 -offsetX,
-      -48 / 2 -offsetY ,
+      80, //cuanto cortar de la imagen
+      48, //cuanto cortar
+      -80 / 2 +17, //posición donde situar la pistola
+      -48 / 2 +2,
       80, //dimensiones de la imagen final
       48
     );
+
+    this.ctx.fillStyle = "red";
+    this.ctx.fillRect(0, 0, 2, 2);
 
     // Restablecer el contexto al estado guardado
     this.ctx.restore();
@@ -365,7 +367,8 @@ class Player {
     if (this.frame < 5) {
       this.arm.start.y = this.position.y + this.arm.offset.y + this.frame - 0.5;
     } else {
-      this.arm.start.y = this.position.y + this.arm.offset.y + 7 - this.frame - 0.5;
+      this.arm.start.y =
+        this.position.y + this.arm.offset.y + 7 - this.frame - 0.5;
     }
     this.arm.start.x = this.position.x + this.arm.offset.x;
     //calcular final brazo
@@ -409,7 +412,13 @@ class Player {
       projectile.update();
     }
     // Filtra los proyectiles que ya no están en pantalla
-    this.projectiles = this.projectiles.filter((projectile) => projectile.position.x > 0 && projectile.position.x < canvas.width && projectile.position.y > 0 && projectile.position.y < canvas.height);
+    this.projectiles = this.projectiles.filter(
+      (projectile) =>
+        projectile.position.x > 0 &&
+        projectile.position.x < canvas.width &&
+        projectile.position.y > 0 &&
+        projectile.position.y < canvas.height
+    );
   }
 }
 class Projectile {
@@ -420,15 +429,26 @@ class Projectile {
     this.speed = 10;
     this.width = 10;
     this.height = 2;
-    this.angle = Math.atan2(this.target.y - this.position.y, this.target.x - this.position.x);
+    this.angle = Math.atan2(
+      this.target.y - this.position.y,
+      this.target.x - this.position.x
+    );
   }
 
   draw() {
     this.ctx.fillStyle = "yellow";
     this.ctx.save();
-    this.ctx.translate(this.position.x + this.width / 2, this.position.y + this.height / 2);
+    this.ctx.translate(
+      this.position.x + this.width / 2,
+      this.position.y + this.height / 2
+    );
     this.ctx.rotate(this.angle);
-    this.ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+    this.ctx.fillRect(
+      -this.width / 2,
+      -this.height / 2,
+      this.width,
+      this.height
+    );
     this.ctx.restore();
   }
 
