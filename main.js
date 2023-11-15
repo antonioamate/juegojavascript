@@ -1,97 +1,211 @@
+let ctx, canvas, backgroundImage, player, enemies, blocks, id1, keys, gravity, projectiles;
+gravity = 0.3;
+enemies = [];
+
+keys = {
+  w: false,
+  a: false,
+  s: false,
+  d: false,
+};
+projectiles = [];
+
+function removeEnemy(enemy) {
+  // Método para eliminar un enemigo del array de enemigos
+  const index = enemies.indexOf(enemy);
+  if (index !== -1) {
+    enemies.splice(index, 1);
+  }
+}
+
+function removeProjectile(projectile) {
+  // Método para eliminar un proyectil del array de proyectiles
+  const index = projectiles.indexOf(projectile);
+  if (index !== -1) {
+    projectiles.splice(index, 1);
+  }
+}
+
+function isColliding(object1, object2) {
+  return (
+    object1.position.x < object2.position.x + object2.size.width &&
+    object1.position.x + object1.size.width > object2.position.x &&
+    object1.position.y < object2.position.y + object2.size.height &&
+    object1.position.y + object1.size.height > object2.position.y
+  );
+  
+}
+
+//PLAYER PROJECTILE
+function checkPlayerProjectileCollisions() {
+  for (const projectile of projectiles) {
+    if (isColliding(projectile, player)) {
+      // Manejar la colisión con la bala aquí
+      player.health -= 20;
+      removeProjectile(projectile);
+    }
+  }
+}
+//PLAYER BLOCK
+function checkPlayerBlockCollisions() {
+  for (const block of blocks) {
+    if (isColliding(player, block)) {
+      // Manejar la colisión del jugador con el bloque aquí
+      console.log("colision");
+      player.speed.x=-player.speed.x* 1.001
+  player.speed.y=-player.speed.y* 1.001
+      return true;
+    }
+  }
+}
+//PLAYER ENEMY
+function checkPlayerEnemyCollisions() {
+  for (const enemy of enemies) {
+    if (isColliding(player, enemy)) {
+      // Manejar la colisión con el enemigo aquí
+      player.health -= 20;
+    }
+  }
+}
+
+//ENEMY PROJECTILE
+function checkEnemyProjectileCollisions() {
+  for (const projectile of projectiles) {
+    for (const enemy of enemies) {
+      if (isColliding(projectile, enemy)) {
+        enemy.health -= 20;
+        removeProjectile(projectile);
+      }
+    }
+  }
+}
+//PROJECTILE BLOCK
+function checkBlockProjectileCollisions() {
+  for (const projectile of projectiles) {
+    for (const block of blocks) {
+      if (isColliding(projectile, block)) {
+        // Manejar la colisión de la bala con el bloque aquí
+        // Por ejemplo, eliminar la bala
+        removeProjectile(projectile);
+      }
+    }
+  }
+}
+//ENEMY BLOCK
+function checkBlockEnemyCollisions() {
+  for (const enemy of enemies) {
+    for (const block of blocks) {
+      if (isColliding(enemy, block)) {
+      }
+    }
+  }
+}
+
+function update() {
+  ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+  player.update();
+  player.draw();
+
+  for (const block of blocks) {
+    block.draw();
+  }
+  for (const enemy of enemies) {
+    enemy.update();
+    enemy.draw();
+  }
+  for (const projectile of projectiles) {
+    projectile.update();
+    projectile.draw();
+  }
+  // Filtra los proyectiles que ya no están en pantalla
+  projectiles = projectiles.filter((projectile) => projectile.position.x > 0 && projectile.position.x < canvas.width && projectile.position.y > 0 && projectile.position.y < canvas.height);
+  checkBlockProjectileCollisions();
+  checkEnemyProjectileCollisions();
+  checkPlayerProjectileCollisions();
+  checkPlayerBlockCollisions();
+  checkPlayerEnemyCollisions();
+  checkPlayerBlockCollisions();
+  checkBlockEnemyCollisions();
+}
+function animation() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  update();
+}
+
 onload = () => {
-  const canvas = document.getElementById("canvas");
-  const ctx = canvas.getContext("2d");
-  const backgroundImage = new Image();
+  blocks = [
+    new CollisionBlock({
+      position: { x: 400, y: 440 },
+      size: { width: 50, heigth: 100 },
+    }),
+    new CollisionBlock({
+      position: { x: 200, y: 200 },
+      size: { width: 100, height: 100 },
+    }),
+    // ... más bloques de colisión
+    new CollisionBlock({
+      position: { x: 300, y: 300 },
+      size: { width: 100, height: 100 },
+    }),
+    // ... más bloques de colisión
+  ];
+  player = new Player({ position: { x: 50, y: 50 } });
+  canvas = document.getElementById("canvas");
+  ctx = canvas.getContext("2d");
+  backgroundImage = new Image();
   backgroundImage.src = "./img/forest.jpg";
 
-  backgroundImage.onload = () => {
-    const player = new Player({ position: { x: 50, y: 50 }, ctx });
-    const blocks = [
-      new CollisionBlock({
-        position: { x: 400, y: 440 },
-        size: { x: 50, y: 100 },
-        ctx
-      }),
-      new CollisionBlock({
-        position: { x: 200, y: 200 },
-        size: { x: 50, y: 100 },
-        ctx
-      }),
-      // ... más bloques de colisión
-    ];
-    function animation() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
-      for (const block of blocks) {
-        block.draw();
-      }
-      
-
-      player.updateProjectiles();
-      player.drawProjectiles();
-
-      player.update();
-
-      player.draw();
+  addEventListener("keydown", (e) => {
+    switch (e.key) {
+      case "w":
+        keys.w = true;
+        break;
+      case "a":
+        keys.a = true;
+        break;
+      case "s":
+        keys.s = true;
+        break;
+      case "d":
+        keys.d = true;
+        break;
     }
+  });
 
-    addEventListener("keydown", (e) => {
-      switch (e.key) {
-        case "w":
-          player.keys.w = true;
-          break;
-        case "a":
-          player.keys.a = true;
-          break;
-        case "s":
-          player.keys.s = true;
-          break;
-        case "d":
-          player.keys.d = true;
-          break;
-      }
-    });
-
-    addEventListener("keyup", (e) => {
-      switch (e.key) {
-        case "w":
-          player.keys.w = false;
-          break;
-        case "a":
-          player.keys.a = false;
-          break;
-        case "s":
-          player.keys.s = false;
-          break;
-        case "d":
-          player.keys.d = false;
-          break;
-      }
-    });
-    addEventListener("mousedown", (e) => {
-      player.keys.click = true;
-    });
-    addEventListener("mouseup", (e) => {
-      player.keys.click = false;
-    });
-    canvas.addEventListener("mousemove", function (event) {
-      player.aim.x = event.clientX - canvas.getBoundingClientRect().left;
-      player.aim.y = event.clientY - canvas.getBoundingClientRect().top;
-    });
-
-    canvas.style.cursor = "url('./img/aim_red.cur'), auto";
-
-    function animate() {
-      animation();
-      requestAnimationFrame(animate);
+  addEventListener("keyup", (e) => {
+    switch (e.key) {
+      case "w":
+        keys.w = false;
+        break;
+      case "a":
+        keys.a = false;
+        break;
+      case "s":
+        keys.s = false;
+        break;
+      case "d":
+        keys.d = false;
+        break;
     }
+  });
+  addEventListener("mousedown", (e) => {
+    keys.click = true;
+  });
+  addEventListener("mouseup", (e) => {
+    keys.click = false;
+  });
+  canvas.addEventListener("mousemove", function (event) {
+    player.aim.x = event.clientX - canvas.getBoundingClientRect().left;
+    player.aim.y = event.clientY - canvas.getBoundingClientRect().top;
+  });
 
-    animate();
-  };
+  canvas.style.cursor = "url('./img/aim_red.cur'), auto";
+
+  id1 = setInterval(animation, 1000 / 60);
 };
 
 class Player {
-  constructor({ position, ctx }) {
+  constructor({ position }) {
     this.pistol = {
       position: {
         x: 300,
@@ -116,14 +230,6 @@ class Player {
     };
     this.pistol.image.src = "./img/pistol.png";
     this.position = position;
-    this.ctx = ctx;
-    this.keys = {
-      w: false,
-      a: false,
-      s: false,
-      d: false,
-      click: false,
-    };
     this.image = new Image();
     this.image.src = "./img/spritestick.png";
 
@@ -138,14 +244,12 @@ class Player {
     this.alternate = 0;
     this.acceleration = 3;
     this.jumpStrength = 12;
-    this.gravity = 0.3;
     this.animation = 2;
     this.frame = 0;
     this.slowFrame = 0;
     this.covered = false;
     this.onGround = false;
     this.facingRight = true;
-    this.projectiles = [];
     this.slowFrameShoot = 0;
     this.fireRate = 20;
     this.aim = {
@@ -172,9 +276,9 @@ class Player {
   }
 
   draw() {
-    /* this.ctx.fillStyle = "rgba(255, 0, 0,0.5)";
-    this.ctx.fillRect(this.position.x, this.position.y, 100, 125); */
-    this.ctx.drawImage(
+    /* ctx.fillStyle = "rgba(255, 0, 0,0.5)";
+    ctx.fillRect(this.position.x, this.position.y, 100, 125); */
+    ctx.drawImage(
       this.image,
       this.frame * 100, //por donde empieza a recortar la imagen
       this.animation * 125,
@@ -190,23 +294,21 @@ class Player {
     this.pistol.position = { x: this.arm.end.x, y: this.arm.end.y };
 
     //dibujar el brazo
-    this.ctx.lineWidth = this.arm.width;
-    this.ctx.lineCap = "round";
-    this.ctx.beginPath();
-    this.ctx.moveTo(this.arm.start.x, this.arm.start.y);
-    this.ctx.lineTo(this.arm.end.x, this.arm.end.y);
-    this.ctx.stroke();
+    ctx.lineWidth = this.arm.width;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(this.arm.start.x, this.arm.start.y);
+    ctx.lineTo(this.arm.end.x, this.arm.end.y);
+    ctx.stroke();
     //dibujar la pistola
 
     // Guardar el estado actual del contexto
-    this.ctx.save();
-    let flip;
-    if (this.arm.angle) console.log(this.arm.angle * Math.PI);
+    ctx.save();
 
-    this.ctx.translate(this.arm.end.x, this.arm.end.y);
-    this.ctx.rotate(this.arm.angle);
+    ctx.translate(this.arm.end.x, this.arm.end.y);
+    ctx.rotate(this.arm.angle);
     if (this.facingRight) {
-      this.ctx.drawImage(
+      ctx.drawImage(
         this.pistol.image,
         80 * this.pistol.frame, //inicio x
         0, //inicio y
@@ -218,8 +320,8 @@ class Player {
         48
       );
     } else {
-      this.ctx.scale(1, -1); // Reflejar horizontalmente
-      this.ctx.drawImage(
+      ctx.scale(1, -1); // Reflejar horizontalmente
+      ctx.drawImage(
         this.pistol.image,
         80 * this.pistol.frame, //inicio x
         0, //inicio y
@@ -231,11 +333,9 @@ class Player {
         48
       );
     }
-    this.ctx.fillStyle = "red";
-    this.ctx.fillRect(0, 0, 2, 2);
 
     // Restablecer el contexto al estado guardado
-    this.ctx.restore();
+    ctx.restore();
   }
   nextFramePistol() {
     if (this.alternate > 0) {
@@ -257,8 +357,9 @@ class Player {
     this.nextFrameShoot();
     this.nextFramePistol();
     this.idleRight();
+    console.log(this.speed);
     this.speed.x = 0;
-    if (this.canShoot && this.keys.click) {
+    if (this.canShoot && keys.click) {
       this.shoot();
       this.canShoot = false;
       this.slowFrameShoot = 0;
@@ -274,7 +375,7 @@ class Player {
     } else {
       this.idleLeft();
     }
-    if (this.keys.a) {
+    if (keys.a) {
       this.speed.x -= this.acceleration;
       if (this.facingRight) {
         this.backLeft();
@@ -282,7 +383,7 @@ class Player {
         this.walkLeft();
       }
     }
-    if (this.keys.d) {
+    if (keys.d) {
       this.speed.x += this.acceleration;
       if (this.facingRight) {
         this.walkRight();
@@ -290,7 +391,7 @@ class Player {
         this.backRight();
       }
     }
-    if (this.keys.s && this.onGround) {
+    if (keys.s && this.onGround) {
       this.speed.x = 0;
       if (this.facingRight) {
         this.coverRight();
@@ -298,7 +399,7 @@ class Player {
         this.coverLeft();
       }
     }
-    if (this.keys.w) {
+    if (keys.w) {
       if (this.animation == 4) {
         this.animation = 3;
       } else if (this.animation == 5) {
@@ -309,7 +410,7 @@ class Player {
     }
 
     //actualizar posición
-    this.speed.y += this.gravity;
+    this.speed.y += gravity;
     if (this.position.y + this.speed.y > 414) {
       this.position.y = 414;
       this.speed.y = 0;
@@ -319,7 +420,6 @@ class Player {
       this.speed.x = 0;
       this.position.x = 0;
     }
-    console.log(this.position.x + " " + this.size.width + " " + this.speed.x);
     if (this.position.x + this.size.width + this.speed.x > 1280) {
       this.speed.x = 0;
       this.position.x = 1280 - this.size.width;
@@ -401,8 +501,7 @@ class Player {
     if (this.frame < 5) {
       this.arm.start.y = this.position.y + this.arm.offset.y + this.frame - 0.5;
     } else {
-      this.arm.start.y =
-        this.position.y + this.arm.offset.y + 7 - this.frame - 0.5;
+      this.arm.start.y = this.position.y + this.arm.offset.y + 7 - this.frame - 0.5;
     }
     this.arm.start.x = this.position.x + this.arm.offset.x;
     //calcular final brazo
@@ -429,61 +528,46 @@ class Player {
       startY: this.arm.end.y,
       targetX: this.aim.x,
       targetY: this.aim.y,
-      ctx: this.ctx,
     });
 
-    this.projectiles.push(projectile);
+    projectiles.push(projectile);
   }
 
   drawProjectiles() {
-    for (const projectile of this.projectiles) {
+    for (const projectile of projectiles) {
       projectile.draw();
     }
   }
 
   updateProjectiles() {
-    for (const projectile of this.projectiles) {
+    for (const projectile of projectiles) {
       projectile.update();
     }
     // Filtra los proyectiles que ya no están en pantalla
-    this.projectiles = this.projectiles.filter(
-      (projectile) =>
-        projectile.position.x > 0 &&
-        projectile.position.x < canvas.width &&
-        projectile.position.y > 0 &&
-        projectile.position.y < canvas.height
-    );
+    projectiles = projectiles.filter((projectile) => projectile.position.x > 0 && projectile.position.x < canvas.width && projectile.position.y > 0 && projectile.position.y < canvas.height);
   }
 }
 class Projectile {
-  constructor({ startX, startY, targetX, targetY, ctx }) {
+  constructor({ startX, startY, targetX, targetY }) {
     this.position = { x: startX, y: startY };
     this.target = { x: targetX, y: targetY };
-    this.ctx = ctx;
-    this.speed = 10;
-    this.width = 10;
-    this.height = 2;
-    this.angle = Math.atan2(
-      this.target.y - this.position.y,
-      this.target.x - this.position.x
-    );
+    this.speed = 15;
+    this.size = {
+      width: 10,
+      height: 2,
+    };
+    this.angle = Math.atan2(this.target.y - this.position.y, this.target.x - this.position.x);
   }
 
   draw() {
-    this.ctx.fillStyle = "yellow";
-    this.ctx.save();
-    this.ctx.translate(
-      this.position.x + this.width / 2,
-      this.position.y + this.height / 2
-    );
-    this.ctx.rotate(this.angle);
-    this.ctx.fillRect(
-      -this.width / 2,
-      -this.height / 2,
-      this.width,
-      this.height
-    );
-    this.ctx.restore();
+    ctx.fillStyle = "yellow";
+    ctx.save();
+    ctx.translate(this.position.x + this.size.width / 2, this.position.y + this.size.height / 2);
+    ctx.rotate(this.angle);
+    console.log(this.angle);
+
+    ctx.fillRect(-this.size.width / 2, -this.size.height / 2, this.size.width, this.size.height);
+    ctx.restore();
   }
 
   update() {
@@ -492,7 +576,7 @@ class Projectile {
   }
 }
 class Enemy {
-  constructor({ position, ctx }) {
+  constructor({ position }) {
     this.pistol = {
       position: {
         x: 710,
@@ -517,14 +601,6 @@ class Enemy {
     };
     this.pistol.image.src = "./img/pistol.png";
     this.position = position;
-    this.ctx = ctx;
-    this.keys = {
-      w: false,
-      a: false,
-      s: false,
-      d: false,
-      click: false,
-    };
     this.image = new Image();
     this.image.src = "./img/spritestick.png";
 
@@ -539,14 +615,12 @@ class Enemy {
     this.alternate = 0;
     this.acceleration = 3;
     this.jumpStrength = 12;
-    this.gravity = 0.3;
     this.animation = 2;
     this.frame = 0;
     this.slowFrame = 0;
     this.covered = false;
     this.onGround = false;
     this.facingRight = true;
-    this.projectiles = [];
     this.slowFrameShoot = 0;
     this.fireRate = 20;
     this.aim = {
@@ -573,9 +647,9 @@ class Enemy {
   }
 
   draw() {
-    /* this.ctx.fillStyle = "rgba(255, 0, 0,0.5)";
-    this.ctx.fillRect(this.position.x, this.position.y, 100, 125); */
-    this.ctx.drawImage(
+    /* ctx.fillStyle = "rgba(255, 0, 0,0.5)";
+    ctx.fillRect(this.position.x, this.position.y, 100, 125); */
+    ctx.drawImage(
       this.image,
       this.frame * 100, //por donde empieza a recortar la imagen
       this.animation * 125,
@@ -591,23 +665,22 @@ class Enemy {
     this.pistol.position = { x: this.arm.end.x, y: this.arm.end.y };
 
     //dibujar el brazo
-    this.ctx.lineWidth = this.arm.width;
-    this.ctx.lineCap = "round";
-    this.ctx.beginPath();
-    this.ctx.moveTo(this.arm.start.x, this.arm.start.y);
-    this.ctx.lineTo(this.arm.end.x, this.arm.end.y);
-    this.ctx.stroke();
+    ctx.lineWidth = this.arm.width;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(this.arm.start.x, this.arm.start.y);
+    ctx.lineTo(this.arm.end.x, this.arm.end.y);
+    ctx.stroke();
     //dibujar la pistola
 
     // Guardar el estado actual del contexto
-    this.ctx.save();
+    ctx.save();
     let flip;
-    if (this.arm.angle) console.log(this.arm.angle * Math.PI);
 
-    this.ctx.translate(this.arm.end.x, this.arm.end.y);
-    this.ctx.rotate(this.arm.angle);
+    ctx.translate(this.arm.end.x, this.arm.end.y);
+    ctx.rotate(this.arm.angle);
     if (this.facingRight) {
-      this.ctx.drawImage(
+      ctx.drawImage(
         this.pistol.image,
         80 * this.pistol.frame, //inicio x
         0, //inicio y
@@ -619,8 +692,8 @@ class Enemy {
         48
       );
     } else {
-      this.ctx.scale(1, -1); // Reflejar horizontalmente
-      this.ctx.drawImage(
+      ctx.scale(1, -1); // Reflejar horizontalmente
+      ctx.drawImage(
         this.pistol.image,
         80 * this.pistol.frame, //inicio x
         0, //inicio y
@@ -632,11 +705,11 @@ class Enemy {
         48
       );
     }
-    this.ctx.fillStyle = "red";
-    this.ctx.fillRect(0, 0, 2, 2);
+    ctx.fillStyle = "red";
+    ctx.fillRect(0, 0, 2, 2);
 
     // Restablecer el contexto al estado guardado
-    this.ctx.restore();
+    ctx.restore();
   }
   nextFramePistol() {
     if (this.alternate > 0) {
@@ -659,7 +732,7 @@ class Enemy {
     this.nextFramePistol();
     this.idleRight();
     this.speed.x = 0;
-    if (this.canShoot && this.keys.click) {
+    if (this.canShoot && keys.click) {
       this.shoot();
       this.canShoot = false;
       this.slowFrameShoot = 0;
@@ -675,7 +748,7 @@ class Enemy {
     } else {
       this.idleLeft();
     }
-    if (this.keys.a) {
+    if (keys.a) {
       this.speed.x -= this.acceleration;
       if (this.facingRight) {
         this.backLeft();
@@ -683,7 +756,7 @@ class Enemy {
         this.walkLeft();
       }
     }
-    if (this.keys.d) {
+    if (keys.d) {
       this.speed.x += this.acceleration;
       if (this.facingRight) {
         this.walkRight();
@@ -691,7 +764,7 @@ class Enemy {
         this.backRight();
       }
     }
-    if (this.keys.s && this.onGround) {
+    if (keys.s && this.onGround) {
       this.speed.x = 0;
       if (this.facingRight) {
         this.coverRight();
@@ -699,7 +772,7 @@ class Enemy {
         this.coverLeft();
       }
     }
-    if (this.keys.w) {
+    if (keys.w) {
       if (this.animation == 4) {
         this.animation = 3;
       } else if (this.animation == 5) {
@@ -710,7 +783,7 @@ class Enemy {
     }
 
     //actualizar posición
-    this.speed.y += this.gravity;
+    this.speed.y += gravity;
     if (this.position.y + this.speed.y > 414) {
       this.position.y = 414;
       this.speed.y = 0;
@@ -720,7 +793,7 @@ class Enemy {
       this.speed.x = 0;
       this.position.x = 0;
     }
-    if (this.position.x + this.size.x + this.speed.x > 1200) {
+    if (this.position.x + this.size.width + this.speed.x > 1200) {
       this.speed.x = 0;
       this.position.x = 1200 - this.size.x;
     }
@@ -801,8 +874,7 @@ class Enemy {
     if (this.frame < 5) {
       this.arm.start.y = this.position.y + this.arm.offset.y + this.frame - 0.5;
     } else {
-      this.arm.start.y =
-        this.position.y + this.arm.offset.y + 7 - this.frame - 0.5;
+      this.arm.start.y = this.position.y + this.arm.offset.y + 7 - this.frame - 0.5;
     }
     this.arm.start.x = this.position.x + this.arm.offset.x;
     //calcular final brazo
@@ -829,47 +901,39 @@ class Enemy {
       startY: this.arm.end.y,
       targetX: this.aim.x,
       targetY: this.aim.y,
-      ctx: this.ctx,
     });
 
-    this.projectiles.push(projectile);
+    projectiles.push(projectile);
   }
 
   drawProjectiles() {
-    for (const projectile of this.projectiles) {
+    for (const projectile of projectiles) {
       projectile.draw();
     }
   }
 
   updateProjectiles() {
-    for (const projectile of this.projectiles) {
+    for (const projectile of projectiles) {
       projectile.update();
     }
     // Filtra los proyectiles que ya no están en pantalla
-    this.projectiles = this.projectiles.filter(
-      (projectile) =>
-        projectile.position.x > 0 &&
-        projectile.position.x < canvas.width &&
-        projectile.position.y > 0 &&
-        projectile.position.y < canvas.height
-    );
+    projectiles = projectiles.filter((projectile) => projectile.position.x > 0 && projectile.position.x < canvas.width && projectile.position.y > 0 && projectile.position.y < canvas.height);
   }
 }
 class CollisionBlock {
-  constructor({ position, size, ctx }) {
+  constructor({ position, size }) {
     this.size = {
-      x: size.x,
-      y: size.y,
+      width: size.width,
+      height: size.height,
     };
     this.position = {
       x: position.x,
       y: position.y,
     };
-    this.ctx=ctx
   }
 
   draw() {
-    this.ctx.fillStyle = "brown"; // Color de los bloques de colisión
-    this.ctx.fillRect(this.position.x, this.position.y, this.size.x, this.size.y);
+    ctx.fillStyle = "brown"; // Color de los bloques de colisión
+    ctx.fillRect(this.position.x, this.position.y, this.size.width, this.size.height);
   }
 }
