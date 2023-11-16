@@ -47,7 +47,7 @@ class Enemy {
       this.speed.x += this.acceleration;
       this.animation = 1;
     }
-
+    comprobarBarrerasInvisibles(this)
     //actualizar posición
     this.speed.y += gravity;
 

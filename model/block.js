@@ -10,11 +10,11 @@ class Block {
   }
 }
 blocks = [
-  new CollisionBlock({
+  new Block({
     position: { x: 400, y: 440 },
     size: { width: 50, height: 100 },
   }),
-  new CollisionBlock({
+  new Block({
     position: { x: 200, y: 200 },
     size: { width: 50, height: 100 },
   }),

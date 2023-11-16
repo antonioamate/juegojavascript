@@ -146,7 +146,7 @@ class Player {
     this.nextFrame();
     this.nextFrameShoot();
     this.nextFramePistol();
-    this.idleRight();
+    this.animationIdleRight();
 
     this.speed.x = 0;
     //comprobar input a ver que hace
@@ -203,7 +203,7 @@ class Player {
     //aplicar gravedad
     this.speed.y += gravity;
 
-    comprobarBarrerasInvisibles();
+    comprobarBarrerasInvisibles(this);
 
     //actualizar posición
     this.position.y += this.speed.y;

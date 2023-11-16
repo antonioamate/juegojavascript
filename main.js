@@ -1,9 +1,8 @@
 let player, enemies, blocks, interval, ctx, canvas, backgroundImage, projectiles, keys, paused, fps, gravity;
-paused = false;
-player = new Player({ position: { x: 50, y: 50 } });
-keys = new Keys();
 blocks = [];
 enemies = [];
+projectiles = [];
+paused = false;
 fps = 60;
 gravity = 0.3;
 onload = () => {
@@ -11,7 +10,9 @@ onload = () => {
   ctx = canvas.getContext("2d");
   backgroundImage = new Image();
   backgroundImage.src = "./img/forest.jpg";
-
+  player = new Player({ position: { x: 50, y: 50 } });
+  keys = new Keys();
+  
   function animation() {
     if (!paused) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);

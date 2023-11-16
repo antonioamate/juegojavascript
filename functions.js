@@ -119,7 +119,6 @@ function updateDrawEnemies() {
 //UPDATE DRAW BLOCKS
 function updateDrawBlocks() {
   for (const block of blocks) {
-    block.update();
     block.draw();
   }
 }
