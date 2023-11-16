@@ -18,6 +18,27 @@ class Player {
       lastShotTime: 0,
       shotCoolDown: 20,
       shoulderDistance: 45,
+      aimDistance: 0,
+    };
+    this.uzi = {
+      canShoot: true,
+      angle: 0,
+      position: {
+        x: 300,
+        y: 300,
+      },
+      image: new Image(),
+      size: {
+        width: 80,
+        height: 48,
+      },
+      frame: 0,
+      facingRight: true,
+      shooting: false,
+      lastShotTime: 0,
+      shotCoolDown: 20,
+      shoulderDistance: 45,
+      aimDistance: 0,
     };
     this.pistol.image.src = "./img/pistol.png";
     this.position = position;
@@ -74,12 +95,7 @@ class Player {
     ctx.moveTo(this.arm.start.x, this.arm.start.y);
     ctx.lineTo(this.arm.end.x, this.arm.end.y);
     ctx.stroke();
-    ctx.lineWidth = 1
-    ctx.lineCap = "round";
-    ctx.beginPath();
-    ctx.moveTo(this.arm.start.x, this.arm.start.y);
-    ctx.lineTo(this.pistol.position.x, this.pistol.position.y);
-    ctx.stroke();
+    
   }
   drawPistol() {
     //dibujar la pistola
@@ -93,14 +109,13 @@ class Player {
       0, //inicio y
       80, //cuanto cortar de la imagen
       48,
-      -80 / 2 +11, //posición donde situar la pistola
+      -80 / 2 + 11, //posición donde situar la pistola
       -48 / 2 + 11,
       80, //dimensiones de la imagen final
       48
     );
     // Restablecer el contexto al estado guardado
     ctx.restore();
-
   }
   getArmPistolDimensions() {
     //calcula la posición del hombro y la posición de la culata a partir del offset, el frame,
@@ -117,10 +132,10 @@ class Player {
     let armRotation;
     let dx = this.aim.x - this.arm.start.x;
     let dy = this.aim.y - this.arm.start.y;
-    let length = Math.sqrt(dx * dx + dy * dy);
+    this.pistol.aimDistance = Math.sqrt(dx * dx + dy * dy);
 
-    let normalizedDx = dx / length;
-    let normalizedDy = dy / length;
+    let normalizedDx = dx / this.pistol.aimDistance;
+    let normalizedDy = dy / this.pistol.aimDistance;
 
     this.pistol.position.x = this.arm.start.x + normalizedDx * this.pistol.shoulderDistance;
     this.pistol.position.y = this.arm.start.y + normalizedDy * this.pistol.shoulderDistance;
@@ -139,12 +154,20 @@ class Player {
   shoot() {
     this.pistol.canShoot = false;
     this.pistol.shooting = true;
-    this.lastShotTime = frame;
+    this.pistol.lastShotTime = frame;
     const audio = new Audio("./sounds/pistolShotCut.mp3");
     audio.play();
+    let angle = this.pistol.angle;
     const projectile = new Projectile({
-      position: this.pistol.position,
-      target: this.aim,
+      position: {
+        x: this.pistol.position.x,
+        y: this.pistol.position.y,
+      },
+      target: {
+        x: this.aim.x,
+        y: this.aim.y,
+      },
+      angle: angle,
     });
     projectiles.push(projectile);
   }
@@ -165,16 +188,15 @@ class Player {
     }
   }
   update() {
-    
-    this.checkInput();
     this.getArmPistolDimensions();
     this.updateCanShoot();
     this.nextFramePistol();
     this.nextAnimationFrame();
-    
+
     this.animationIdleRight();
-    
+
     this.speed.x = 0;
+    this.checkInput();
     //comprobar input a ver que hace
 
     //aplicar gravedad
@@ -208,8 +230,10 @@ class Player {
     this.drawArm();
     this.drawPistol();
   }
-  checkInput() {            //&& keys.click
-    if (this.pistol.canShoot ) {
+  checkInput() {
+    //&& keys.click
+    console.log(this.aim.x)
+    if (this.pistol.canShoot && keys.click) {
       this.shoot();
     }
     if (this.aim.x < this.position.x + 60) {
