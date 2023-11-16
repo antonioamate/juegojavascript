@@ -16,7 +16,6 @@ function removeEnemy(enemy) {
   if (index !== -1) {
     enemies.splice(index, 1);
   }
-  
 }
 
 function removeProjectile(projectile) {
@@ -34,6 +33,7 @@ function isColliding(object1, object2) {
     object1.position.y < object2.position.y + object2.size.height &&
     object1.position.y + object1.size.height > object2.position.y
   );
+  
 }
 
 //PLAYER PROJECTILE
@@ -52,8 +52,8 @@ function checkPlayerBlockCollisions() {
     if (isColliding(player, block)) {
       // Manejar la colisión del jugador con el bloque aquí
       console.log("colision");
-      player.speed.x = -player.speed.x * 1.001;
-      player.speed.y = -player.speed.y * 1.001;
+      player.speed.x=-player.speed.x* 1.001
+  player.speed.y=-player.speed.y* 1.001
       return true;
     }
   }
@@ -73,7 +73,7 @@ function checkEnemyProjectileCollisions() {
   for (const projectile of projectiles) {
     for (const enemy of enemies) {
       if (isColliding(projectile, enemy)) {
-        enemy.health = enemy.health - 20;
+        enemy.health -= 20;
         removeProjectile(projectile);
       }
     }
@@ -91,7 +91,6 @@ function checkBlockProjectileCollisions() {
     }
   }
 }
-
 //ENEMY BLOCK
 function checkBlockEnemyCollisions() {
   for (const enemy of enemies) {
@@ -111,12 +110,8 @@ function update() {
     block.draw();
   }
   for (const enemy of enemies) {
-    if (enemy.health < 0) {
-      removeEnemy(enemy);
-    } else {
-      enemy.update();
-      enemy.draw();
-    }
+    enemy.update();
+    enemy.draw();
   }
   for (const projectile of projectiles) {
     projectile.update();
@@ -138,17 +133,19 @@ function animation() {
 }
 
 onload = () => {
-  enemies.push(new Enemy({ position: { x: 600, y: 100 } }));
   blocks = [
     new CollisionBlock({
-      position: { x: 400, y: 200 },
+      position: { x: 400, y: 440 },
       size: { width: 50, heigth: 100 },
     }),
-     
+    new CollisionBlock({
+      position: { x: 200, y: 200 },
+      size: { width: 100, height: 100 },
+    }),
     // ... más bloques de colisión
     new CollisionBlock({
-      position: { x: 300, y: 440 },
-      size: { width: 20, height: 100 },
+      position: { x: 300, y: 300 },
+      size: { width: 100, height: 100 },
     }),
     // ... más bloques de colisión
   ];
@@ -554,7 +551,7 @@ class Projectile {
   constructor({ startX, startY, targetX, targetY }) {
     this.position = { x: startX, y: startY };
     this.target = { x: targetX, y: targetY };
-    this.speed = 20;
+    this.speed = 15;
     this.size = {
       width: 10,
       height: 2,
@@ -580,7 +577,6 @@ class Projectile {
 }
 class Enemy {
   constructor({ position }) {
-    this.health = 100;
     this.pistol = {
       position: {
         x: 710,
@@ -736,7 +732,7 @@ class Enemy {
     this.nextFramePistol();
     this.idleRight();
     this.speed.x = 0;
-    if (this.canShoot && Math.abs(this.position.x - player.position.x) > 200) {
+    if (this.canShoot && keys.click) {
       this.shoot();
       this.canShoot = false;
       this.slowFrameShoot = 0;
@@ -752,7 +748,7 @@ class Enemy {
     } else {
       this.idleLeft();
     }
-    if (Math.abs(this.position.x - player.position.x) > 200) {
+    if (keys.a) {
       this.speed.x -= this.acceleration;
       if (this.facingRight) {
         this.backLeft();
@@ -760,7 +756,7 @@ class Enemy {
         this.walkLeft();
       }
     }
-    if (this.position.x < player.position.x + 100) {
+    if (keys.d) {
       this.speed.x += this.acceleration;
       if (this.facingRight) {
         this.walkRight();
@@ -775,6 +771,15 @@ class Enemy {
       } else {
         this.coverLeft();
       }
+    }
+    if (keys.w) {
+      if (this.animation == 4) {
+        this.animation = 3;
+      } else if (this.animation == 5) {
+        this.animation = 2;
+      }
+
+      this.jump();
     }
 
     //actualizar posición
