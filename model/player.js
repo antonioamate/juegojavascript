@@ -41,6 +41,7 @@ class Player {
       aimDistance: 0,
     };
     this.pistol.image.src = "./img/pistol.png";
+    this.uzi.image.src = "./img/uzi.png";
     this.position = position;
     this.image = new Image();
     this.image.src = "./img/spritestick.png";

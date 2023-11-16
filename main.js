@@ -1,3 +1,13 @@
+//TODO general
+
+//que se pueda cambiar de arma a una uzi
+//con los números o con la q o con la rueda del ratón o varias cosas
+//hacer que cuando corra el hombro se quede fijo
+//implantar el sprite de muerte
+//añadir sprite a los enemigos
+//hacer colisiones con bloques
+//crear una hitbox y que cambie segun la animación
+
 let player, enemies, blocks, interval, ctx, canvas, backgroundImage, projectiles, keys, paused, fps, gravity,frame;
 frame=0
 blocks = [];
