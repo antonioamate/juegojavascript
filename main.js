@@ -27,12 +27,12 @@ onload = () => {
 
 
 
-      
+
       frame++
     }
-    setTimeout(() => {
+    /* setTimeout(() => {
       requestAnimationFrame(animation);
-    }, 1000 / fps);
+    }, 1000 / fps); */
   }
 
   addEventListener("keydown", (e) => {
@@ -80,5 +80,6 @@ onload = () => {
     player.aim.y = event.clientY - canvas.getBoundingClientRect().top;
   });
   canvas.style.cursor = "url('./img/aim_red.cur'), auto";
-  animation();
+  //animation();
+  setInterval(animation,1000/fps)
 };

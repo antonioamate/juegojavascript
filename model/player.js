@@ -15,14 +15,6 @@ class Player {
       frame: 0,
       facingRight: true,
       shooting: false,
-      start: {
-        x: 0,
-        y: 0,
-      },
-      end: {
-        x: 0,
-        y: 0,
-      },
       lastShotTime: 0,
       shotCoolDown: 20,
       shoulderDistance: 45,
@@ -168,7 +160,7 @@ class Player {
     }
   }
   updateCanShoot() {
-    if (frame - this.lastShotTime > this.shotCoolDown) {
+    if (frame - this.pistol.lastShotTime > this.pistol.shotCoolDown) {
       this.pistol.canShoot = true;
     }
   }
@@ -216,8 +208,8 @@ class Player {
     this.drawArm();
     this.drawPistol();
   }
-  checkInput() {
-    if (this.pistol.canShoot && keys.click) {
+  checkInput() {            //&& keys.click
+    if (this.pistol.canShoot ) {
       this.shoot();
     }
     if (this.aim.x < this.position.x + 60) {
