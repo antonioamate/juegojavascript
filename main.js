@@ -1,4 +1,5 @@
-let player, enemies, blocks, interval, ctx, canvas, backgroundImage, projectiles, keys, paused, fps, gravity;
+let player, enemies, blocks, interval, ctx, canvas, backgroundImage, projectiles, keys, paused, fps, gravity,frame;
+frame=0
 blocks = [];
 enemies = [];
 projectiles = [];
@@ -24,7 +25,10 @@ onload = () => {
 
 
 
+
+
       
+      frame++
     }
     setTimeout(() => {
       requestAnimationFrame(animation);

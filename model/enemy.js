@@ -39,6 +39,10 @@ class Enemy {
     this.nextFrame();
     this.speed.x = 0;
     //andar hacia el jugador
+    if(this.health<0){
+      this.animation=2
+      
+    }
     if (player.position.x < this.position.x) {
       this.speed.x -= this.acceleration;
       this.animation = 0;
