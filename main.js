@@ -1,7 +1,6 @@
 //TODO general
 
-//que se pueda cambiar de arma a una uzi
-//con los números o con la q o con la rueda del ratón o varias cosas
+//que se pueda cambiar de arma a una uzi con los números o con la q o con la rueda del ratón o varias cosas
 //hacer colisiones con bloques
 //crear una hitbox y que cambie segun la animación
 

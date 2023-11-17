@@ -1,5 +1,15 @@
 class Player {
   constructor({ position }) {
+    this.hitbox = {
+      position: {
+        x: 0,
+        y: 0,
+      },
+      size: {
+        width: 0,
+        height: 0,
+      },
+    };
     this.health = 100;
     this.dead = false;
     this.deathTime = 0;
@@ -87,8 +97,10 @@ class Player {
     };
   }
   drawPlayer() {
-    ctx.fillStyle = "rgba(255, 0, 0,0.5)";
+    ctx.fillStyle = "rgba(255, 0, 0,0.2)";
     ctx.fillRect(this.position.x, this.position.y, 100, 125);
+    ctx.fillStyle = "rgba(0, 255, 0,0.5)";
+    ctx.fillRect(this.hitbox.position.x, this.hitbox.position.y, this.hitbox.size.width, this.hitbox.size.height);
     ctx.drawImage(
       this.image,
       this.frame * 100,
@@ -327,40 +339,74 @@ class Player {
     this.animation = 0;
     this.arm.offset.x = 19;
     this.arm.offset.y = 23;
+    this.hitbox.position.x=this.position.x
+    this.hitbox.position.y=this.position.y
+    this.hitbox.size.width=this.size.width-2
+    this.hitbox.size.height=this.size.height
+
   }
   animationWalkRight() {
     this.animation = 1;
     this.arm.offset.x = 81;
     this.arm.offset.y = 23;
+    this.hitbox.position.x=this.position.x+2
+    this.hitbox.position.y=this.position.y
+    this.hitbox.size.width=this.size.width-2
+    this.hitbox.size.height=this.size.height
+    
   }
   animationIdleRight() {
     this.animation = 2;
     this.arm.offset.x = 67;
     this.arm.offset.y = 28;
+    this.hitbox.position.x=this.position.x+50
+    this.hitbox.position.y=this.position.y
+    this.hitbox.size.width=this.size.width-70
+    this.hitbox.size.height=this.size.height
   }
   animationIdleLeft() {
     this.animation = 3;
     this.arm.offset.x = 60;
     this.arm.offset.y = 28;
+    this.hitbox.position.x=this.position.x+49
+    this.hitbox.position.y=this.position.y
+    this.hitbox.size.width=this.size.width-72
+    this.hitbox.size.height=this.size.height
   }
   animationCoverLeft() {
     this.animation = 4;
     this.arm.offset.x = 70;
     this.arm.offset.y = 64;
+    this.hitbox.position.x=this.position.x+42
+    this.hitbox.position.y=this.position.y+39
+    this.hitbox.size.width=this.size.width-42
+    this.hitbox.size.height=this.size.height-39
   }
   animationCoverRight() {
     this.animation = 5;
     this.arm.offset.x = 49;
     this.arm.offset.y = 64;
+    this.hitbox.position.x=this.position.x+19
+    this.hitbox.position.y=this.position.y+38
+    this.hitbox.size.width=this.size.width-42
+    this.hitbox.size.height=this.size.height-40
   }
   animationBackLeft() {
     this.animation = 6;
     this.arm.offset.x = 81;
     this.arm.offset.y = 23;
+    this.hitbox.position.x=this.position.x+2
+    this.hitbox.position.y=this.position.y
+    this.hitbox.size.width=this.size.width-2
+    this.hitbox.size.height=this.size.height
   }
   animationBackRight() {
     this.animation = 7;
     this.arm.offset.x = 19;
     this.arm.offset.y = 23;
+    this.hitbox.position.x=this.position.x
+    this.hitbox.position.y=this.position.y
+    this.hitbox.size.width=this.size.width-2
+    this.hitbox.size.height=this.size.height
   }
 }

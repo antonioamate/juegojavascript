@@ -1,5 +1,15 @@
 class Enemy {
   constructor(positionx) {
+    this.hitbox = {
+      position: {
+        x: 0,
+        y: 0,
+      },
+      size: {
+        width: 0,
+        height: 0,
+      },
+    };
     this.health = 100;
     this.dead = false;
     this.deathTime = 0;
@@ -25,7 +35,9 @@ class Enemy {
   }
 
   draw() {
-    ctx.fillStyle = "rgba(255, 0, 0,0.5)";
+    ctx.fillStyle = "rgba(0, 255, 0,0.5)";
+    ctx.fillRect(this.hitbox.position.x, this.hitbox.position.y, this.hitbox.size.width, this.hitbox.size.height);
+    ctx.fillStyle = "rgba(255, 0, 0,0.2)";
     ctx.fillRect(this.position.x, this.position.y, 100, 125);
     ctx.drawImage(
       this.image,
@@ -61,10 +73,18 @@ class Enemy {
       if (player.position.x < this.position.x) {
         this.speed.x -= this.acceleration;
         this.animation = 0;
+        this.hitbox.position.x = this.position.x+40
+        this.hitbox.position.y = this.position.y;
+        this.hitbox.size.width = this.size.width - 80;
+        this.hitbox.size.height = this.size.height;
       }
       if (player.position.x > this.position.x) {
         this.speed.x += this.acceleration;
         this.animation = 1;
+        this.hitbox.position.x = this.position.x+40
+        this.hitbox.position.y = this.position.y;
+        this.hitbox.size.width = this.size.width - 80;
+        this.hitbox.size.height = this.size.height;
       }
       this.nextAnimationFrame();
 
