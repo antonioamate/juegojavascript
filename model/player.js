@@ -212,7 +212,7 @@ class Player {
       this.dead = true;
       this.deathTime = frame;
       this.frame = 0;
-      randomSound(deathSoundsPlayer)
+      randomSound(playerDeath)
     } else if (this.dead) {
       this.nextFrameDead();
       if(frame- this.deathTime > 140 ){
@@ -237,7 +237,7 @@ class Player {
       //actualizar posición
       this.position.y += this.speed.y;
       this.position.x += this.speed.x;
-      //a partir de la posición del jugador obtengo
+      
       this.getArmPistolDimensions();
     }
   }
@@ -245,7 +245,7 @@ class Player {
   jump() {
     if (this.onGround) {
       this.speed.y -= this.jumpStrength;
-      randomSound(jumpsounds)
+      randomSound(jump);
       this.onGround = false;
     }
   }

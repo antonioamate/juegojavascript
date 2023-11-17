@@ -1,6 +1,7 @@
-deathSoundsPlayer = ["wasted", "windowsxp", "mariodeath", "astronomia", "funeral", "justdeath", "rickroll", "coolstory", "estudiar"];
-deathSoundsEnemy = ["windowsxp"];
-jumpsounds = ["mariojump", "uwu", "kasumi-jump"];
+playerDeath = ["wasted", "windowsxp", "mariodeath", "astronomia", "funeral", "justdeath", "rickroll", "coolstory", "estudiar"];
+enemyDeath = ["windowsxp"];
+jump = ["mariojump", "uwu", "kasumi-jump"];
+playerHurt = 
 
 function randomSound(array) {
   let index = Math.floor(Math.random() * array.length);
@@ -11,7 +12,6 @@ function randomSound(array) {
 function newGame() {
   killCount = 0;
   frame = 0;
-  blocks = [];
   enemies = [];
   enemies.push(new Enemy(Math.random() * 1200));
   projectiles = [];
@@ -67,23 +67,6 @@ function checkPlayerBlockCollisions() {
     }
   }
 }
-//PLAYER ENEMY COLLISIONS
-function checkPlayerEnemyCollisions() {
-  for (const enemy of enemies) {
-    if (!enemy.dead) {
-      if (
-        player.hitbox.position.x < enemy.hitbox.position.x + enemy.hitbox.size.width &&
-        player.hitbox.position.x + player.hitbox.size.width > enemy.hitbox.position.x &&
-        player.hitbox.position.y < enemy.hitbox.position.y + enemy.hitbox.size.height &&
-        player.hitbox.position.y + player.hitbox.size.height > enemy.hitbox.position.y
-      ) {
-        // Manejar la colisión con el enemigo aquí
-        player.health -= 1;
-        console.log(player.health);
-      }
-    }
-  }
-}
 
 //ENEMY PROJECTILE COLLISIONS
 function checkEnemyProjectileCollisions() {
@@ -96,7 +79,7 @@ function checkEnemyProjectileCollisions() {
           projectile.hitbox.position.y < enemy.hitbox.position.y + enemy.hitbox.size.height &&
           projectile.hitbox.position.y + projectile.hitbox.size.height > enemy.hitbox.position.y
         ) {
-          enemy.health-=20;
+          enemy.health-=projectile.damage;
           removeProjectile(projectile);
           console.log("enemigo alcanzado");
         }
@@ -104,26 +87,7 @@ function checkEnemyProjectileCollisions() {
     }
   }
 }
-//PROJECTILE BLOCK COLLISIONS
-function checkBlockProjectileCollisions() {
-  for (const projectile of projectiles) {
-    for (const block of blocks) {
-      if (isColliding(projectile, block)) {
-        removeProjectile(projectile);
-      }
-    }
-  }
-}
 
-//ENEMY BLOCK COLLISIONS
-function checkBlockEnemyCollisions() {
-  for (const enemy of enemies) {
-    for (const block of blocks) {
-      if (isColliding(enemy, block)) {
-      }
-    }
-  }
-}
 //UPDATE DRAW PROJECTILES
 function updateDrawProjectiles() {
   for (const projectile of projectiles) {
@@ -153,8 +117,4 @@ function updateDrawPlayer() {
 //CHECK COLLISIONS
 function checkAllCollisions() {
   checkEnemyProjectileCollisions();
-  checkBlockEnemyCollisions();
-  checkBlockProjectileCollisions();
-  checkPlayerBlockCollisions();
-  checkPlayerEnemyCollisions();
 }

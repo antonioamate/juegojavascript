@@ -10,7 +10,7 @@ class Projectile {
         height: 2,
       },
     };
-    this.damage = 30;
+    this.damage = 20;
     this.position = {
       x: position.x,
       y: position.y,
@@ -41,10 +41,21 @@ class Projectile {
   }
 
   update() {
+
     this.position.x += this.speed * Math.cos(this.angle);
     this.position.y += this.speed * Math.sin(this.angle);
     
     this.hitbox.position.x=this.position.x+this.size.width/2-this.hitbox.size.width/2
     this.hitbox.position.y=this.position.y
+    for (const block of blocks) {
+      if (
+        this.hitbox.position.x < block.position.x + block.size.width &&
+        this.hitbox.position.x + this.hitbox.size.width > block.position.x &&
+        this.hitbox.position.y < block.position.y + block.size.height &&
+        this.hitbox.position.y + this.hitbox.size.height > block.position.y
+      ) {
+        removeProjectile(this);
+      }
+    }
   }
 }

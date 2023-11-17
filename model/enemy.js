@@ -1,5 +1,6 @@
 class Enemy {
   constructor(positionx) {
+    this.lastBite=0
     this.hitbox = {
       position: {
         x: 0,
@@ -75,7 +76,8 @@ class Enemy {
           enemies.push(new Enemy(Math.random() * 1200));
         }
       } else {
-        if (player.position.x < this.position.x) {
+        //moverse en la dirección del jugador y mover la hitbox
+        if (player.position.x <= this.position.x) {
           this.speed.x -= this.acceleration;
           this.animation = 0;
           this.hitbox.position.x = this.position.x + 40;
@@ -90,6 +92,32 @@ class Enemy {
           this.hitbox.position.y = this.position.y;
           this.hitbox.size.width = this.size.width - 80;
           this.hitbox.size.height = this.size.height;
+        }
+        //comprobar colisiones del enemigo con todos los bloques
+        for (const block of blocks) {
+          if (
+            this.hitbox.position.x + this.speed.x < block.position.x + block.size.width &&
+            this.hitbox.position.x + this.hitbox.size.width + this.speed.x > block.position.x &&
+            this.hitbox.position.y + this.speed.y < block.position.y + block.size.height &&
+            this.hitbox.position.y + this.hitbox.size.height + this.speed.y > block.position.y
+          ) {
+            this.speed.x=0
+            this.speed.y=0
+          }
+        }
+        //comprobar si el enemigo nos ha hecho daño hace más de medio segundo
+        if (frame - this.lastBite > 30 ) {
+          //comprobar si colisiona con el jugador
+          if (
+            player.hitbox.position.x < this.hitbox.position.x + this.hitbox.size.width &&
+            player.hitbox.position.x + player.hitbox.size.width > this.hitbox.position.x &&
+            player.hitbox.position.y < this.hitbox.position.y + this.hitbox.size.height &&
+            player.hitbox.position.y + player.hitbox.size.height > this.hitbox.position.y
+          ) {
+            this.lastBite=frame
+            // Manejar la colisión con el enemigo aquí
+            player.health -= 5;
+          }
         }
         this.nextAnimationFrame();
 
