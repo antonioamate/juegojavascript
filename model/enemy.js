@@ -66,8 +66,8 @@ class Enemy {
       if (frame - this.deathTime > 600) {
         //aquí tiene que desaparecer el cadaver (o no)
         removeEnemy(this);
-        enemies.push(new Enemy(1100));
-        enemies.push(new Enemy(1000));
+        enemies.push(new Enemy(Math.random()*1200));
+        enemies.push(new Enemy(Math.random()*1200));
       }
     } else {
       if (player.position.x < this.position.x) {

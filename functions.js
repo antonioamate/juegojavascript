@@ -1,3 +1,14 @@
+function newGame() {
+  killCount = 0;
+  frame = 0;
+  blocks = [];
+  enemies = [];
+  enemies.push(new Enemy(Math.random()*1200));
+  projectiles = [];
+  paused = false;
+  player = new Player({ position: { x: 50, y: 50 } });
+}
+
 //BARRERAS INVISIBLES
 function comprobarBarrerasInvisibles(object) {
   if (object.position.y + object.speed.y > 414) {
@@ -29,32 +40,37 @@ function removeProjectile(projectile) {
     projectiles.splice(index, 1);
   }
 }
-//IS COLLIDING
-function isColliding(object1, object2) {
-  return (
-    object1.position.x < object2.position.x + object2.size.width &&
-    object1.position.x + object1.size.width > object2.position.x &&
-    object1.position.y < object2.position.y + object2.size.height &&
-    object1.position.y + object1.size.height > object2.position.y
-  );
-}
+
 //PLAYER BLOCK COLLISIONS
 function checkPlayerBlockCollisions() {
   for (const block of blocks) {
-    if (isColliding(player, block)) {
+    if (
+      player.hitbox.position.x + player.speed.x < block.position.x + block.size.width &&
+      player.hitbox.position.x + player.hitbox.size.width + player.speed.x > block.position.x &&
+      player.hitbox.position.y < block.position.y + block.size.height &&
+      player.hitbox.position.y + player.hitbox.size.height > block.position.y
+    ) {
       // Manejar la colisión del jugador con el bloque aquí
       console.log("colision");
-      player.speed.x = -player.speed.x * 1.005;
-      player.speed.y = -player.speed.y * 1.005;
+      player.speed.x = 0;
+      player.speed.y = 0;
     }
   }
 }
 //PLAYER ENEMY COLLISIONS
 function checkPlayerEnemyCollisions() {
   for (const enemy of enemies) {
-    if (isColliding(player, enemy)) {
-      // Manejar la colisión con el enemigo aquí
-      player.health -= 20;
+    if (!enemy.dead) {
+      if (
+        player.hitbox.position.x < enemy.hitbox.position.x + enemy.hitbox.size.width &&
+        player.hitbox.position.x + player.hitbox.size.width > enemy.hitbox.position.x &&
+        player.hitbox.position.y < enemy.hitbox.position.y + enemy.hitbox.size.height &&
+        player.hitbox.position.y + player.hitbox.size.height > enemy.hitbox.position.y
+      ) {
+        // Manejar la colisión con el enemigo aquí
+        player.health -= 1;
+        console.log(player.health);
+      }
     }
   }
 }
@@ -63,9 +79,15 @@ function checkPlayerEnemyCollisions() {
 function checkEnemyProjectileCollisions() {
   for (const projectile of projectiles) {
     for (const enemy of enemies) {
-      if (isColliding(projectile, enemy)) {
+      if (
+        projectile.hitbox.position.x < enemy.hitbox.position.x + enemy.hitbox.size.width &&
+        projectile.hitbox.position.x + projectile.hitbox.size.width > enemy.hitbox.position.x &&
+        projectile.hitbox.position.y < enemy.hitbox.position.y + enemy.hitbox.size.height &&
+        projectile.hitbox.position.y + projectile.hitbox.size.height > enemy.hitbox.position.y
+      ) {
         enemy.health = enemy.health - 20;
         removeProjectile(projectile);
+        console.log("enemigo alcanzado");
       }
     }
   }
@@ -115,4 +137,12 @@ function updateDrawBlocks() {
 function updateDrawPlayer() {
   player.update();
   player.draw();
+}
+//CHECK COLLISIONS
+function checkAllCollisions() {
+  checkEnemyProjectileCollisions();
+  checkBlockEnemyCollisions();
+  checkBlockProjectileCollisions();
+  checkPlayerBlockCollisions();
+  checkPlayerEnemyCollisions();
 }

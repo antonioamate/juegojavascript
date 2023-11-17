@@ -101,17 +101,7 @@ class Player {
     ctx.fillRect(this.position.x, this.position.y, 100, 125);
     ctx.fillStyle = "rgba(0, 255, 0,0.5)";
     ctx.fillRect(this.hitbox.position.x, this.hitbox.position.y, this.hitbox.size.width, this.hitbox.size.height);
-    ctx.drawImage(
-      this.image,
-      this.frame * 100,
-      this.animation * 125,
-      100,
-      125,
-      this.position.x,
-      this.position.y,
-      100,
-      125
-    );
+    ctx.drawImage(this.image, this.frame * 100, this.animation * 125, 100, 125, this.position.x, this.position.y, 100, 125);
   }
   drawArm() {
     //dibujar el brazo
@@ -149,8 +139,7 @@ class Player {
     if (this.frame < 5) {
       this.arm.start.y = this.position.y + this.arm.offset.y + this.frame - 0.5;
     } else {
-      this.arm.start.y =
-        this.position.y + this.arm.offset.y + 7 - this.frame - 0.5;
+      this.arm.start.y = this.position.y + this.arm.offset.y + 7 - this.frame - 0.5;
     }
     this.arm.start.x = this.position.x + this.arm.offset.x;
 
@@ -163,22 +152,16 @@ class Player {
     let normalizedDx = dx / this.pistol.aimDistance;
     let normalizedDy = dy / this.pistol.aimDistance;
 
-    this.pistol.position.x =
-      this.arm.start.x + normalizedDx * this.pistol.shoulderDistance;
-    this.pistol.position.y =
-      this.arm.start.y + normalizedDy * this.pistol.shoulderDistance;
+    this.pistol.position.x = this.arm.start.x + normalizedDx * this.pistol.shoulderDistance;
+    this.pistol.position.y = this.arm.start.y + normalizedDy * this.pistol.shoulderDistance;
     this.pistol.angle = Math.atan2(dy, dx);
 
     //ajustar el brazo segun donde mire el jugador
 
     armRotation = this.facingRight ? 0.16 : -0.16;
 
-    let armDX =
-      normalizedDx * Math.cos(armRotation) -
-      normalizedDy * Math.sin(armRotation);
-    let armDY =
-      normalizedDx * Math.sin(armRotation) +
-      normalizedDy * Math.cos(armRotation);
+    let armDX = normalizedDx * Math.cos(armRotation) - normalizedDy * Math.sin(armRotation);
+    let armDY = normalizedDx * Math.sin(armRotation) + normalizedDy * Math.cos(armRotation);
 
     this.arm.end.x = this.arm.start.x + armDX * this.arm.length;
     this.arm.end.y = this.arm.start.y + armDY * this.arm.length;
@@ -229,11 +212,14 @@ class Player {
       this.dead = true;
       this.deathTime = frame;
       this.frame = 0;
+      const audio = new Audio("./sounds/wasted.mp3");
+      audio.play();
     } else if (this.dead) {
       this.nextFrameDead();
       if (frame - this.deathTime > 600) {
         //aquí se tiene que acabar el juego
-        paused = true;
+        
+        newGame();
       }
     } else {
       this.animationIdleRight();
@@ -282,12 +268,14 @@ class Player {
 
   draw() {
     this.drawPlayer();
-    this.drawArm();
-    this.drawPistol();
+    if (!this.dead) {
+      this.drawArm();
+      this.drawPistol();
+    }
   }
   checkInput() {
     //&& keys.click
-    console.log(this.aim.x);
+
     if (this.pistol.canShoot && keys.click) {
       this.shoot();
     }
@@ -339,74 +327,72 @@ class Player {
     this.animation = 0;
     this.arm.offset.x = 19;
     this.arm.offset.y = 23;
-    this.hitbox.position.x=this.position.x
-    this.hitbox.position.y=this.position.y
-    this.hitbox.size.width=this.size.width-2
-    this.hitbox.size.height=this.size.height
-
+    this.hitbox.position.x = this.position.x;
+    this.hitbox.position.y = this.position.y;
+    this.hitbox.size.width = this.size.width - 50;
+    this.hitbox.size.height = this.size.height;
   }
   animationWalkRight() {
     this.animation = 1;
     this.arm.offset.x = 81;
     this.arm.offset.y = 23;
-    this.hitbox.position.x=this.position.x+2
-    this.hitbox.position.y=this.position.y
-    this.hitbox.size.width=this.size.width-2
-    this.hitbox.size.height=this.size.height
-    
+    this.hitbox.position.x = this.position.x + 50;
+    this.hitbox.position.y = this.position.y;
+    this.hitbox.size.width = this.size.width - 50;
+    this.hitbox.size.height = this.size.height;
   }
   animationIdleRight() {
     this.animation = 2;
     this.arm.offset.x = 67;
     this.arm.offset.y = 28;
-    this.hitbox.position.x=this.position.x+50
-    this.hitbox.position.y=this.position.y
-    this.hitbox.size.width=this.size.width-70
-    this.hitbox.size.height=this.size.height
+    this.hitbox.position.x = this.position.x + 50;
+    this.hitbox.position.y = this.position.y;
+    this.hitbox.size.width = this.size.width - 70;
+    this.hitbox.size.height = this.size.height;
   }
   animationIdleLeft() {
     this.animation = 3;
     this.arm.offset.x = 60;
     this.arm.offset.y = 28;
-    this.hitbox.position.x=this.position.x+49
-    this.hitbox.position.y=this.position.y
-    this.hitbox.size.width=this.size.width-72
-    this.hitbox.size.height=this.size.height
+    this.hitbox.position.x = this.position.x + 49;
+    this.hitbox.position.y = this.position.y;
+    this.hitbox.size.width = this.size.width - 72;
+    this.hitbox.size.height = this.size.height;
   }
   animationCoverLeft() {
     this.animation = 4;
     this.arm.offset.x = 70;
     this.arm.offset.y = 64;
-    this.hitbox.position.x=this.position.x+42
-    this.hitbox.position.y=this.position.y+39
-    this.hitbox.size.width=this.size.width-42
-    this.hitbox.size.height=this.size.height-39
+    this.hitbox.position.x = this.position.x + 42;
+    this.hitbox.position.y = this.position.y + 39;
+    this.hitbox.size.width = this.size.width - 42;
+    this.hitbox.size.height = this.size.height - 39;
   }
   animationCoverRight() {
     this.animation = 5;
     this.arm.offset.x = 49;
     this.arm.offset.y = 64;
-    this.hitbox.position.x=this.position.x+19
-    this.hitbox.position.y=this.position.y+38
-    this.hitbox.size.width=this.size.width-42
-    this.hitbox.size.height=this.size.height-40
+    this.hitbox.position.x = this.position.x + 19;
+    this.hitbox.position.y = this.position.y + 38;
+    this.hitbox.size.width = this.size.width - 42;
+    this.hitbox.size.height = this.size.height - 40;
   }
   animationBackLeft() {
     this.animation = 6;
     this.arm.offset.x = 81;
     this.arm.offset.y = 23;
-    this.hitbox.position.x=this.position.x+2
-    this.hitbox.position.y=this.position.y
-    this.hitbox.size.width=this.size.width-2
-    this.hitbox.size.height=this.size.height
+    this.hitbox.position.x = this.position.x + 50;
+    this.hitbox.position.y = this.position.y;
+    this.hitbox.size.width = this.size.width - 50;
+    this.hitbox.size.height = this.size.height;
   }
   animationBackRight() {
     this.animation = 7;
     this.arm.offset.x = 19;
     this.arm.offset.y = 23;
-    this.hitbox.position.x=this.position.x
-    this.hitbox.position.y=this.position.y
-    this.hitbox.size.width=this.size.width-2
-    this.hitbox.size.height=this.size.height
+    this.hitbox.position.x = this.position.x;
+    this.hitbox.position.y = this.position.y;
+    this.hitbox.size.width = this.size.width - 50;
+    this.hitbox.size.height = this.size.height;
   }
 }
