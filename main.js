@@ -2,13 +2,11 @@
 
 //que se pueda cambiar de arma a una uzi
 //con los números o con la q o con la rueda del ratón o varias cosas
-//hacer que cuando corra el hombro se quede fijo
-//implantar el sprite de muerte
-//añadir sprite a los enemigos
 //hacer colisiones con bloques
 //crear una hitbox y que cambie segun la animación
 
-let player, enemies, blocks, interval, ctx, canvas, backgroundImage, projectiles, keys, paused, fps, gravity,frame;
+let player, enemies, blocks, interval, ctx, canvas, backgroundImage, projectiles, keys, paused, fps, gravity,frame,killCount;
+killCount=0
 frame=0
 blocks = [];
 enemies = [];
@@ -22,6 +20,7 @@ onload = () => {
   backgroundImage = new Image();
   backgroundImage.src = "./img/forest.jpg";
   player = new Player({ position: { x: 50, y: 50 } });
+  enemies.push(new Enemy(1000))
   keys = new Keys();
   
   function animation() {

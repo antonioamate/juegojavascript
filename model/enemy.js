@@ -1,14 +1,19 @@
 class Enemy {
-  constructor({ position }) {
+  constructor(positionx) {
     this.health = 100;
-    this.position = position;
+    this.dead = false;
+    this.deathTime = 0;
+    this.position = {
+      x: positionx,
+      y: 100,
+    };
     this.size = {
       width: 100,
       height: 125,
     };
 
     this.image = new Image();
-    this.image.src = "./img/spritestick.png";
+    this.image.src = "./img/spriteenemy.png";
     this.speed = {
       x: 0,
       y: 0,
@@ -16,7 +21,6 @@ class Enemy {
     this.acceleration = 0.5;
     this.animation = 2;
     this.frame = 0;
-    this.slowFrame = 0;
     this.onGround = true;
   }
 
@@ -36,38 +40,61 @@ class Enemy {
     );
   }
   update() {
-    this.nextFrame();
     this.speed.x = 0;
-    //andar hacia el jugador
-    if(this.health<0){
-      this.animation=2
-      
-    }
-    if (player.position.x < this.position.x) {
-      this.speed.x -= this.acceleration;
-      this.animation = 0;
-    }
-    if (player.position.x > this.position.x) {
-      this.speed.x += this.acceleration;
-      this.animation = 1;
-    }
-    comprobarBarrerasInvisibles(this)
-    //actualizar posición
-    this.speed.y += gravity;
+    //en el momento en el que lo matan estaba vivo y es la primera vez que se muere
+    //si está muerto no se puede morir más y se guarda la hora de la defunción
+    //el frame se pone a 0
+    if (!this.dead && this.health <= 0) {
+      this.animation = 2;
+      this.dead = true;
+      this.deathTime = frame;
+      this.frame = 0;
+    } else if (this.dead) {
+      this.nextFrameDead();
+      if (frame - this.deathTime > 600) {
+        //aquí tiene que desaparecer el cadaver (o no)
+        removeEnemy(this);
+        enemies.push(new Enemy(1100));
+        enemies.push(new Enemy(1000));
+      }
+    } else {
+      if (player.position.x < this.position.x) {
+        this.speed.x -= this.acceleration;
+        this.animation = 0;
+      }
+      if (player.position.x > this.position.x) {
+        this.speed.x += this.acceleration;
+        this.animation = 1;
+      }
+      this.nextAnimationFrame();
 
-    this.position.y += this.speed.y;
-    this.position.x += this.speed.x;
+      //aplicar gravedad
+      this.speed.y += gravity;
+
+      comprobarBarrerasInvisibles(this);
+
+      //actualizar posición
+      this.position.y += this.speed.y;
+      this.position.x += this.speed.x;
+      //a partir de la posición del jugador obtengo
+    }
   }
-  nextFrame() {
-    if (this.slowFrame > 8) {
+  nextAnimationFrame() {
+    if (frame % 8 === 0) {
       if (this.frame < 7) {
         this.frame++;
       } else {
         this.frame = 0;
       }
-      this.slowFrame = 0;
-    } else {
-      this.slowFrame++;
+    }
+  }
+  nextFrameDead() {
+    if (frame % 8 === 0) {
+      if (this.frame >= 7) {
+        this.frame = 7;
+      } else {
+        this.frame++;
+      }
     }
   }
 }

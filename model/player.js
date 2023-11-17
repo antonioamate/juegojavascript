@@ -1,5 +1,8 @@
 class Player {
   constructor({ position }) {
+    this.health = 100;
+    this.dead = false;
+    this.deathTime = 0;
     this.pistol = {
       canShoot: true,
       angle: 0,
@@ -36,7 +39,7 @@ class Player {
       facingRight: true,
       shooting: false,
       lastShotTime: 0,
-      shotCoolDown: 20,
+      shotCoolDown: 5,
       shoulderDistance: 45,
       aimDistance: 0,
     };
@@ -86,7 +89,17 @@ class Player {
   drawPlayer() {
     ctx.fillStyle = "rgba(255, 0, 0,0.5)";
     ctx.fillRect(this.position.x, this.position.y, 100, 125);
-    ctx.drawImage(this.image, this.frame * 100, this.animation * 125, 100, 125, this.position.x, this.position.y, 100, 125);
+    ctx.drawImage(
+      this.image,
+      this.frame * 100,
+      this.animation * 125,
+      100,
+      125,
+      this.position.x,
+      this.position.y,
+      100,
+      125
+    );
   }
   drawArm() {
     //dibujar el brazo
@@ -96,7 +109,6 @@ class Player {
     ctx.moveTo(this.arm.start.x, this.arm.start.y);
     ctx.lineTo(this.arm.end.x, this.arm.end.y);
     ctx.stroke();
-    
   }
   drawPistol() {
     //dibujar la pistola
@@ -125,7 +137,8 @@ class Player {
     if (this.frame < 5) {
       this.arm.start.y = this.position.y + this.arm.offset.y + this.frame - 0.5;
     } else {
-      this.arm.start.y = this.position.y + this.arm.offset.y + 7 - this.frame - 0.5;
+      this.arm.start.y =
+        this.position.y + this.arm.offset.y + 7 - this.frame - 0.5;
     }
     this.arm.start.x = this.position.x + this.arm.offset.x;
 
@@ -138,16 +151,22 @@ class Player {
     let normalizedDx = dx / this.pistol.aimDistance;
     let normalizedDy = dy / this.pistol.aimDistance;
 
-    this.pistol.position.x = this.arm.start.x + normalizedDx * this.pistol.shoulderDistance;
-    this.pistol.position.y = this.arm.start.y + normalizedDy * this.pistol.shoulderDistance;
+    this.pistol.position.x =
+      this.arm.start.x + normalizedDx * this.pistol.shoulderDistance;
+    this.pistol.position.y =
+      this.arm.start.y + normalizedDy * this.pistol.shoulderDistance;
     this.pistol.angle = Math.atan2(dy, dx);
 
     //ajustar el brazo segun donde mire el jugador
 
     armRotation = this.facingRight ? 0.16 : -0.16;
 
-    let armDX = normalizedDx * Math.cos(armRotation) - normalizedDy * Math.sin(armRotation);
-    let armDY = normalizedDx * Math.sin(armRotation) + normalizedDy * Math.cos(armRotation);
+    let armDX =
+      normalizedDx * Math.cos(armRotation) -
+      normalizedDy * Math.sin(armRotation);
+    let armDY =
+      normalizedDx * Math.sin(armRotation) +
+      normalizedDy * Math.cos(armRotation);
 
     this.arm.end.x = this.arm.start.x + armDX * this.arm.length;
     this.arm.end.y = this.arm.start.y + armDY * this.arm.length;
@@ -189,36 +208,56 @@ class Player {
     }
   }
   update() {
-   
-    this.updateCanShoot();
-    this.nextFramePistol();
-    this.nextAnimationFrame();
-
-    this.animationIdleRight();
-
     this.speed.x = 0;
-    this.checkInput();
-    //comprobar input a ver que hace
+    //en el momento en el que lo matan estaba vivo y es la primera vez que se muere
+    //si está muerto no se puede morir más y se guarda la hora de la defunción
+    //el frame se pone a 0
+    if (!this.dead && this.health <= 0) {
+      this.animation = 8;
+      this.dead = true;
+      this.deathTime = frame;
+      this.frame = 0;
+    } else if (this.dead) {
+      this.nextFrameDead();
+      if (frame - this.deathTime > 600) {
+        //aquí se tiene que acabar el juego
+        paused = true;
+      }
+    } else {
+      this.animationIdleRight();
+      this.updateCanShoot();
+      this.nextFramePistol();
+      this.nextAnimationFrame();
+      this.checkInput();
 
-    //aplicar gravedad
-    this.speed.y += gravity;
+      //aplicar gravedad
+      this.speed.y += gravity;
 
-    comprobarBarrerasInvisibles(this);
+      comprobarBarrerasInvisibles(this);
 
-    //actualizar posición
-    this.position.y += this.speed.y;
-    this.position.x += this.speed.x;
-    //a partir de la posición del jugador obtengo 
-    this.getArmPistolDimensions();
-
+      //actualizar posición
+      this.position.y += this.speed.y;
+      this.position.x += this.speed.x;
+      //a partir de la posición del jugador obtengo
+      this.getArmPistolDimensions();
+    }
   }
+
   jump() {
     if (this.onGround) {
       this.speed.y -= this.jumpStrength;
       this.onGround = false;
     }
   }
-
+  nextFrameDead() {
+    if (frame % 8 === 0) {
+      if (this.frame >= 7) {
+        this.frame = 7;
+      } else {
+        this.frame++;
+      }
+    }
+  }
   nextAnimationFrame() {
     if (frame % 8 === 0) {
       if (this.frame < 7) {
@@ -236,7 +275,7 @@ class Player {
   }
   checkInput() {
     //&& keys.click
-    console.log(this.aim.x)
+    console.log(this.aim.x);
     if (this.pistol.canShoot && keys.click) {
       this.shoot();
     }

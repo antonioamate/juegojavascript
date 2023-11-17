@@ -38,18 +38,7 @@ function isColliding(object1, object2) {
     object1.position.y + object1.size.height > object2.position.y
   );
 }
-
-//PLAYER PROJECTILE
-function checkPlayerProjectileCollisions() {
-  for (const projectile of projectiles) {
-    if (isColliding(projectile, player)) {
-      // Manejar la colisión con la bala aquí
-      player.health -= 20;
-      removeProjectile(projectile);
-    }
-  }
-}
-//PLAYER BLOCK
+//PLAYER BLOCK COLLISIONS
 function checkPlayerBlockCollisions() {
   for (const block of blocks) {
     if (isColliding(player, block)) {
@@ -60,7 +49,7 @@ function checkPlayerBlockCollisions() {
     }
   }
 }
-//PLAYER ENEMY
+//PLAYER ENEMY COLLISIONS
 function checkPlayerEnemyCollisions() {
   for (const enemy of enemies) {
     if (isColliding(player, enemy)) {
@@ -70,7 +59,7 @@ function checkPlayerEnemyCollisions() {
   }
 }
 
-//ENEMY PROJECTILE
+//ENEMY PROJECTILE COLLISIONS
 function checkEnemyProjectileCollisions() {
   for (const projectile of projectiles) {
     for (const enemy of enemies) {
@@ -81,7 +70,7 @@ function checkEnemyProjectileCollisions() {
     }
   }
 }
-//PROJECTILE BLOCK
+//PROJECTILE BLOCK COLLISIONS
 function checkBlockProjectileCollisions() {
   for (const projectile of projectiles) {
     for (const block of blocks) {
@@ -92,7 +81,7 @@ function checkBlockProjectileCollisions() {
   }
 }
 
-//ENEMY BLOCK
+//ENEMY BLOCK COLLISIONS
 function checkBlockEnemyCollisions() {
   for (const enemy of enemies) {
     for (const block of blocks) {
