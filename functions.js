@@ -1,9 +1,10 @@
-deathSoundsPlayer=["wasted","windowsxp","mariodeath","astronomia","funeral","justdeath"]
-deathSoundsEnemy=["windowsxp"]
+deathSoundsPlayer = ["wasted", "windowsxp", "mariodeath", "astronomia", "funeral", "justdeath", "rickroll", "coolstory", "estudiar"];
+deathSoundsEnemy = ["windowsxp"];
+jumpsounds = ["mariojump", "uwu", "kasumi-jump"];
 
-function randomSound(array){
-  let index = Math.floor(Math.random()*array.length)
-  const audio = new Audio("./sounds/"+array[index]+".mp3");
+function randomSound(array) {
+  let index = Math.floor(Math.random() * array.length);
+  const audio = new Audio("./sounds/" + array[index] + ".mp3");
   audio.play();
 }
 
@@ -12,7 +13,7 @@ function newGame() {
   frame = 0;
   blocks = [];
   enemies = [];
-  enemies.push(new Enemy(Math.random()*1200));
+  enemies.push(new Enemy(Math.random() * 1200));
   projectiles = [];
   paused = false;
   player = new Player({ position: { x: 50, y: 50 } });
@@ -88,15 +89,17 @@ function checkPlayerEnemyCollisions() {
 function checkEnemyProjectileCollisions() {
   for (const projectile of projectiles) {
     for (const enemy of enemies) {
-      if (
-        projectile.hitbox.position.x < enemy.hitbox.position.x + enemy.hitbox.size.width &&
-        projectile.hitbox.position.x + projectile.hitbox.size.width > enemy.hitbox.position.x &&
-        projectile.hitbox.position.y < enemy.hitbox.position.y + enemy.hitbox.size.height &&
-        projectile.hitbox.position.y + projectile.hitbox.size.height > enemy.hitbox.position.y
-      ) {
-        enemy.health = enemy.health - 20;
-        removeProjectile(projectile);
-        console.log("enemigo alcanzado");
+      if (!enemy.dead) {
+        if (
+          projectile.hitbox.position.x < enemy.hitbox.position.x + enemy.hitbox.size.width &&
+          projectile.hitbox.position.x + projectile.hitbox.size.width > enemy.hitbox.position.x &&
+          projectile.hitbox.position.y < enemy.hitbox.position.y + enemy.hitbox.size.height &&
+          projectile.hitbox.position.y + projectile.hitbox.size.height > enemy.hitbox.position.y
+        ) {
+          enemy.health-=20;
+          removeProjectile(projectile);
+          console.log("enemigo alcanzado");
+        }
       }
     }
   }

@@ -245,6 +245,7 @@ class Player {
   jump() {
     if (this.onGround) {
       this.speed.y -= this.jumpStrength;
+      randomSound(jumpsounds)
       this.onGround = false;
     }
   }
