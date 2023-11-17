@@ -189,7 +189,7 @@ class Player {
     }
   }
   update() {
-    this.getArmPistolDimensions();
+   
     this.updateCanShoot();
     this.nextFramePistol();
     this.nextAnimationFrame();
@@ -208,6 +208,9 @@ class Player {
     //actualizar posición
     this.position.y += this.speed.y;
     this.position.x += this.speed.x;
+    //a partir de la posición del jugador obtengo 
+    this.getArmPistolDimensions();
+
   }
   jump() {
     if (this.onGround) {
