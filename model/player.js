@@ -212,14 +212,15 @@ class Player {
       this.dead = true;
       this.deathTime = frame;
       this.frame = 0;
-      const audio = new Audio("./sounds/wasted.mp3");
-      audio.play();
+      randomSound(deathSoundsPlayer)
     } else if (this.dead) {
       this.nextFrameDead();
+      if(frame- this.deathTime > 140 ){
+        
+        paused=true
+      }
       if (frame - this.deathTime > 600) {
         //aquí se tiene que acabar el juego
-        
-        newGame();
       }
     } else {
       this.animationIdleRight();

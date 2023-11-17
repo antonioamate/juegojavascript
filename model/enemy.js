@@ -53,51 +53,56 @@ class Enemy {
   }
   update() {
     this.speed.x = 0;
-    //en el momento en el que lo matan estaba vivo y es la primera vez que se muere
-    //si está muerto no se puede morir más y se guarda la hora de la defunción
-    //el frame se pone a 0
-    if (!this.dead && this.health <= 0) {
-      this.animation = 2;
-      this.dead = true;
-      this.deathTime = frame;
-      this.frame = 0;
-    } else if (this.dead) {
-      this.nextFrameDead();
-      if (frame - this.deathTime > 600) {
-        //aquí tiene que desaparecer el cadaver (o no)
-        removeEnemy(this);
-        enemies.push(new Enemy(Math.random()*1200));
-        enemies.push(new Enemy(Math.random()*1200));
-      }
-    } else {
-      if (player.position.x < this.position.x) {
-        this.speed.x -= this.acceleration;
-        this.animation = 0;
-        this.hitbox.position.x = this.position.x+40
-        this.hitbox.position.y = this.position.y;
-        this.hitbox.size.width = this.size.width - 80;
-        this.hitbox.size.height = this.size.height;
-      }
-      if (player.position.x > this.position.x) {
-        this.speed.x += this.acceleration;
-        this.animation = 1;
-        this.hitbox.position.x = this.position.x+40
-        this.hitbox.position.y = this.position.y;
-        this.hitbox.size.width = this.size.width - 80;
-        this.hitbox.size.height = this.size.height;
-      }
-      this.nextAnimationFrame();
-
-      //aplicar gravedad
-      this.speed.y += gravity;
-
-      comprobarBarrerasInvisibles(this);
-
-      //actualizar posición
-      this.position.y += this.speed.y;
-      this.position.x += this.speed.x;
-      //a partir de la posición del jugador obtengo
+    if (frame % (Math.floor(Math.random() * 1500) +120) === 0){
+      const audio = new Audio("./sounds/zombie.mp3");
+      audio.play();
     }
+      if (!this.dead && this.health <= 0) {
+        //en el momento en el que lo matan estaba vivo y es la primera vez que se muere
+        //si está muerto no se puede morir más y se guarda la hora de la defunción
+        //el frame se pone a 0
+        this.animation = 2;
+        this.dead = true;
+        this.deathTime = frame;
+        this.frame = 0;
+        randomSound(deathSoundsEnemy)
+      } else if (this.dead) {
+        this.nextFrameDead();
+        if (frame - this.deathTime > 300) {
+          //aquí tiene que desaparecer el cadaver (o no)
+          removeEnemy(this);
+          enemies.push(new Enemy(Math.random() * 1200));
+          enemies.push(new Enemy(Math.random() * 1200));
+        }
+      } else {
+        if (player.position.x < this.position.x) {
+          this.speed.x -= this.acceleration;
+          this.animation = 0;
+          this.hitbox.position.x = this.position.x + 40;
+          this.hitbox.position.y = this.position.y;
+          this.hitbox.size.width = this.size.width - 80;
+          this.hitbox.size.height = this.size.height;
+        }
+        if (player.position.x > this.position.x) {
+          this.speed.x += this.acceleration;
+          this.animation = 1;
+          this.hitbox.position.x = this.position.x + 40;
+          this.hitbox.position.y = this.position.y;
+          this.hitbox.size.width = this.size.width - 80;
+          this.hitbox.size.height = this.size.height;
+        }
+        this.nextAnimationFrame();
+
+        //aplicar gravedad
+        this.speed.y += gravity;
+
+        comprobarBarrerasInvisibles(this);
+
+        //actualizar posición
+        this.position.y += this.speed.y;
+        this.position.x += this.speed.x;
+        //a partir de la posición del jugador obtengo
+      }
   }
   nextAnimationFrame() {
     if (frame % 8 === 0) {

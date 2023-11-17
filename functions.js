@@ -1,3 +1,12 @@
+deathSoundsPlayer=["wasted","windowsxp","mariodeath","astronomia","funeral","justdeath"]
+deathSoundsEnemy=["windowsxp"]
+
+function randomSound(array){
+  let index = Math.floor(Math.random()*array.length)
+  const audio = new Audio("./sounds/"+array[index]+".mp3");
+  audio.play();
+}
+
 function newGame() {
   killCount = 0;
   frame = 0;

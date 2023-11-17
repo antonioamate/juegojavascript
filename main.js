@@ -1,4 +1,4 @@
-let player, enemies, blocks, interval, ctx, canvas, backgroundImage, projectiles, keys, paused, fps, gravity, frame, killCount;
+let player, enemies, blocks, interval, ctx, canvas, backgroundImage, projectiles, keys, paused, fps, gravity, frame, killCount, deathSounds;
 
 fps = 60;
 gravity = 0.3;
