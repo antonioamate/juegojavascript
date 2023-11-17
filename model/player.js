@@ -1,5 +1,14 @@
-class Player {
-  constructor({ position }) {
+import * as main from "./main.js";
+import * as g from './global.js'
+import * as data from './data.js'
+import Block from './model/block.js'
+import Keys from './model/keys.js'
+import Enemy from './model/enemy.js'
+import Projectile from './model/projectile.js'
+
+
+export default class Player {
+  constructor() {
     this.hitbox = {
       position: {
         x: 0,
@@ -55,7 +64,10 @@ class Player {
     };
     this.pistol.image.src = "./img/pistol.png";
     this.uzi.image.src = "./img/uzi.png";
-    this.position = position;
+    this.position = {
+      x: (Math.random() * 1260)+10,
+      y: 50,
+    };
     this.image = new Image();
     this.image.src = "./img/spritestick.png";
 
@@ -97,28 +109,28 @@ class Player {
     };
   }
   drawPlayer() {
-    ctx.fillStyle = "rgba(255, 0, 0,0.2)";
-    ctx.fillRect(this.position.x, this.position.y, 100, 125);
-    ctx.fillStyle = "rgba(0, 255, 0,0.5)";
-    ctx.fillRect(this.hitbox.position.x, this.hitbox.position.y, this.hitbox.size.width, this.hitbox.size.height);
-    ctx.drawImage(this.image, this.frame * 100, this.animation * 125, 100, 125, this.position.x, this.position.y, 100, 125);
+    g.ctx.fillStyle = "rgba(255, 0, 0,0.2)";
+    g.ctx.fillRect(this.position.x, this.position.y, 100, 125);
+    g.ctx.fillStyle = "rgba(0, 255, 0,0.5)";
+    g.ctx.fillRect(this.hitbox.position.x, this.hitbox.position.y, this.hitbox.size.width, this.hitbox.size.height);
+    g.ctx.drawImage(this.image, this.frame * 100, this.animation * 125, 100, 125, this.position.x, this.position.y, 100, 125);
   }
   drawArm() {
     //dibujar el brazo
-    ctx.lineWidth = this.arm.width;
-    ctx.lineCap = "round";
-    ctx.beginPath();
-    ctx.moveTo(this.arm.start.x, this.arm.start.y);
-    ctx.lineTo(this.arm.end.x, this.arm.end.y);
-    ctx.stroke();
+    g.ctx.lineWidth = this.arm.width;
+    g.ctx.lineCap = "round";
+    g.ctx.beginPath();
+    g.ctx.moveTo(this.arm.start.x, this.arm.start.y);
+    g.ctx.lineTo(this.arm.end.x, this.arm.end.y);
+    g.ctx.stroke();
   }
   drawPistol() {
     //dibujar la pistola
-    ctx.save();
-    ctx.translate(this.pistol.position.x, this.pistol.position.y);
-    ctx.rotate(this.pistol.angle);
-    if (!this.facingRight) ctx.scale(1, -1); // Reflejar horizontalmente
-    ctx.drawImage(
+    g.ctx.save();
+    g.ctx.translate(this.pistol.position.x, this.pistol.position.y);
+    g.ctx.rotate(this.pistol.angle);
+    if (!this.facingRight) g.ctx.scale(1, -1); // Reflejar horizontalmente
+    g.ctx.drawImage(
       this.pistol.image,
       80 * this.pistol.frame, //inicio x
       0, //inicio y
@@ -130,7 +142,7 @@ class Player {
       48
     );
     // Restablecer el contexto al estado guardado
-    ctx.restore();
+    g.ctx.restore();
   }
   getArmPistolDimensions() {
     //calcula la posición del hombro y la posición de la culata a partir del offset, el frame,
@@ -169,7 +181,7 @@ class Player {
   shoot() {
     this.pistol.canShoot = false;
     this.pistol.shooting = true;
-    this.pistol.lastShotTime = frame;
+    this.pistol.lastShotTime = g.frame;
     const audio = new Audio("./sounds/pistolShotCut.mp3");
     audio.play();
     let angle = this.pistol.angle;
@@ -184,7 +196,7 @@ class Player {
       },
       angle: angle,
     });
-    projectiles.push(projectile);
+    g.projectiles.push(projectile);
   }
   nextFramePistol() {
     if (this.pistol.shooting) {
@@ -198,7 +210,7 @@ class Player {
     }
   }
   updateCanShoot() {
-    if (frame - this.pistol.lastShotTime > this.pistol.shotCoolDown) {
+    if (g.frame - this.pistol.lastShotTime > this.pistol.shotCoolDown) {
       this.pistol.canShoot = true;
     }
   }
@@ -212,14 +224,14 @@ class Player {
       this.dead = true;
       this.deathTime = frame;
       this.frame = 0;
-      randomSound(playerDeath)
+      g.randomSound(g.playerDeathSounds)
     } else if (this.dead) {
       this.nextFrameDead();
       if(frame- this.deathTime > 140 ){
         
-        paused=true
+        g.paused=true
       }
-      if (frame - this.deathTime > 600) {
+      if (g.frame - this.deathTime > 600) {
         //aquí se tiene que acabar el juego
       }
     } else {
@@ -230,9 +242,9 @@ class Player {
       this.checkInput();
 
       //aplicar gravedad
-      this.speed.y += gravity;
+      this.speed.y += g.gravity;
 
-      comprobarBarrerasInvisibles(this);
+      g.comprobarBarrerasInvisibles(this);
 
       //actualizar posición
       this.position.y += this.speed.y;
@@ -245,12 +257,12 @@ class Player {
   jump() {
     if (this.onGround) {
       this.speed.y -= this.jumpStrength;
-      randomSound(jump);
+      g.randomSound(g.jumpSounds);
       this.onGround = false;
     }
   }
   nextFrameDead() {
-    if (frame % 8 === 0) {
+    if (g.frame % 8 === 0) {
       if (this.frame >= 7) {
         this.frame = 7;
       } else {
@@ -259,7 +271,7 @@ class Player {
     }
   }
   nextAnimationFrame() {
-    if (frame % 8 === 0) {
+    if (g.frame % 8 === 0) {
       if (this.frame < 7) {
         this.frame++;
       } else {
@@ -278,20 +290,23 @@ class Player {
   checkInput() {
     //&& keys.click
 
-    if (this.pistol.canShoot && keys.click) {
+    if (this.pistol.canShoot && g.keys.click) {
       this.shoot();
     }
+    //girarse hacia el mouse
     if (this.aim.x < this.position.x + 60) {
       this.facingRight = false;
     } else {
       this.facingRight = true;
     }
+    //de primeras cambiar la animación a idle
     if (this.facingRight) {
       this.animationIdleRight();
     } else {
       this.animationIdleLeft();
     }
-    if (keys.a) {
+
+    if (g.keys.a) {
       this.speed.x -= this.acceleration;
       if (this.facingRight) {
         this.animationBackLeft();
@@ -299,7 +314,7 @@ class Player {
         this.animationWalkLeft();
       }
     }
-    if (keys.d) {
+    if (g.keys.d) {
       this.speed.x += this.acceleration;
       if (this.facingRight) {
         this.animationWalkRight();
@@ -307,7 +322,7 @@ class Player {
         this.animationBackRight();
       }
     }
-    if (keys.s && this.onGround) {
+    if (g.keys.s && this.onGround) {
       this.speed.x = 0;
       if (this.facingRight) {
         this.animationCoverRight();
@@ -315,7 +330,7 @@ class Player {
         this.animationCoverLeft();
       }
     }
-    if (keys.w) {
+    if (g.keys.w) {
       if (this.animation == 4) {
         this.animation = 3;
       } else if (this.animation == 5) {
