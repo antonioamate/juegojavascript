@@ -1,9 +1,4 @@
-import Player from '/model/player.js'
-import Keys from '/model/keys.js'
-import Enemy from '/model/enemy.js'
-import Projectile from '/model/projectile.js'
-
-export default class Block {
+class Block {
   constructor({ position, size }) {
     this.size = size;
     this.position = position;

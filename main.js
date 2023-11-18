@@ -1,9 +1,3 @@
-import Block from '/model/block.js'
-import Player from '/model/player.js'
-import Keys from '/model/keys.js'
-import Enemy from '/model/enemy.js'
-import Projectile from '/model/projectile.js'
-
 function animation() {
   if (!paused) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);

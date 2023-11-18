@@ -1,11 +1,5 @@
-
-import Block from "/model/block.js";
-import Player from "/model/player.js";
-import Keys from "/model/keys.js";
-import Projectile from "/model/projectile.js";
-
-export default class Enemy {
-  constructor(positionx) {
+class Enemy {
+  constructor() {
     this.lastBite = 0;
     this.hitbox = {
       position: {
@@ -105,17 +99,7 @@ export default class Enemy {
         this.hitbox.size.height = this.size.height;
       }
       //comprobar colisiones del enemigo con todos los bloques
-      for (const block of blocks) {
-        if (
-          this.hitbox.position.x + this.speed.x < block.position.x + block.size.width &&
-          this.hitbox.position.x + this.hitbox.size.width + this.speed.x > block.position.x &&
-          this.hitbox.position.y + this.speed.y < block.position.y + block.size.height &&
-          this.hitbox.position.y + this.hitbox.size.height + this.speed.y > block.position.y
-        ) {
-          this.speed.x = 0;
-          this.speed.y = 0;
-        }
-      }
+      
       //comprobar si colisiona con el jugador
       if (
         player.hitbox.position.x < this.hitbox.position.x + this.hitbox.size.width &&

@@ -1,10 +1,4 @@
-
-import Block from "/model/block.js";
-import Player from "/model/player.js";
-import Keys from "/model/keys.js";
-import Enemy from "/model/enemy.js";
-
-export default class Projectile {
+class Projectile {
   constructor({ position, target, angle }) {
     this.hitbox = {
       position: {

@@ -1,10 +1,4 @@
-import Block from '/model/block.js'
-import Keys from '/model/keys.js'
-import Enemy from '/model/enemy.js'
-import Projectile from '/model/projectile.js'
-
-
-export default class Player {
+class Player {
   constructor() {
     this.hitbox = {
       position: {
@@ -303,6 +297,7 @@ export default class Player {
       this.animationIdleLeft();
     }
 
+    //aquí es donde se toca la velocidad
     if (keys.a) {
       this.speed.x -= this.acceleration;
       if (this.facingRight) {

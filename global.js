@@ -1,9 +1,3 @@
-import Block from "/model/block.js";
-import Player from "/model/player.js";
-import Keys from "/model/keys.js";
-import Enemy from "/model/enemy.js";
-import Projectile from "/model/projectile.js";
-
 let player,
   enemies,
   interval,
@@ -96,7 +90,18 @@ function removeProjectile(projectile) {
     projectiles.splice(index, 1);
   }
 }
-
+//ENEMY BLOCK COLLISIONS
+for (const block of blocks) {
+  if (
+    this.hitbox.position.x + this.speed.x < block.position.x + block.size.width &&
+    this.hitbox.position.x + this.hitbox.size.width + this.speed.x > block.position.x &&
+    this.hitbox.position.y + this.speed.y < block.position.y + block.size.height &&
+    this.hitbox.position.y + this.hitbox.size.height + this.speed.y > block.position.y
+  ) {
+    this.speed.x = 0;
+    this.speed.y = 0;
+  }
+}
 //PLAYER BLOCK COLLISIONS
 function checkPlayerBlockCollisions() {
   for (const block of blocks) {
@@ -207,6 +212,7 @@ function handleKeyUp(e) {
       break;
   }
 }
+//HANDLE SCROLL
 function handleScroll(e) {
   let delta = e.deltaY;
   console.log(delta);
