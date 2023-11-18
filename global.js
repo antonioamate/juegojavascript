@@ -1,10 +1,10 @@
-import Block from "./model/block.js";
-import Player from "./model/player.js";
-import Keys from "./model/keys.js";
-import Enemy from "./model/enemy.js";
-import Projectile from "./model/projectile.js";
+import Block from "/model/block.js";
+import Player from "/model/player.js";
+import Keys from "/model/keys.js";
+import Enemy from "/model/enemy.js";
+import Projectile from "/model/projectile.js";
 
-export let player,
+let player,
   enemies,
   interval,
   ctx,
@@ -17,7 +17,7 @@ export let player,
   gravity,
   frame,
   killCount;
-export const blocks = [
+const blocks = [
   new Block({
     position: { x: 400, y: 440 },
     size: { width: 50, height: 100 },
@@ -28,7 +28,7 @@ export const blocks = [
   }),
 ];
 
-export const playerDeathSounds = [
+const playerDeathSounds = [
   "wasted",
   "windowsxp",
   "mariodeath",
@@ -39,16 +39,16 @@ export const playerDeathSounds = [
   "coolstory",
   "estudiar",
 ];
-export const enemyDeathSounds = ["windowsxp"];
-export const jumpSounds = ["mariojump", "uwu", "kasumi-jump"];
+const enemyDeathSounds = ["windowsxp"];
+const jumpSounds = ["mariojump", "uwu", "kasumi-jump"];
 
-export function randomSound(array) {
+function randomSound(array) {
   let index = Math.floor(Math.random() * array.length);
   const audio = new Audio("./sounds/" + array[index] + ".mp3");
   audio.play();
 }
 
-export function newGame() {
+function newGame() {
   canvas = document.getElementById("canvas");
   ctx = canvas.getContext("2d");
   backgroundImage = new Image();
@@ -66,7 +66,7 @@ export function newGame() {
 }
 
 //BARRERAS INVISIBLES
-export function comprobarBarrerasInvisibles(object) {
+function comprobarBarrerasInvisibles(object) {
   if (object.hitbox.position.y + object.speed.y > 414) {
     object.hitbox.position.y = 414;
     object.speed.y = 0;
@@ -83,14 +83,14 @@ export function comprobarBarrerasInvisibles(object) {
 }
 
 //REMOVE ENEMY
-export function removeEnemy(enemy) {
+function removeEnemy(enemy) {
   const index = enemies.indexOf(enemy);
   if (index !== -1) {
     enemies.splice(index, 1);
   }
 }
 //REMOVE PROJECTILE
-export function removeProjectile(projectile) {
+function removeProjectile(projectile) {
   const index = projectiles.indexOf(projectile);
   if (index !== -1) {
     projectiles.splice(index, 1);
@@ -98,7 +98,7 @@ export function removeProjectile(projectile) {
 }
 
 //PLAYER BLOCK COLLISIONS
-export function checkPlayerBlockCollisions() {
+function checkPlayerBlockCollisions() {
   for (const block of blocks) {
     if (
       player.hitbox.position.x + player.speed.x < block.position.x + block.size.width &&
@@ -115,7 +115,7 @@ export function checkPlayerBlockCollisions() {
 }
 
 //ENEMY PROJECTILE COLLISIONS
-export function checkEnemyProjectileCollisions() {
+function checkEnemyProjectileCollisions() {
   for (const projectile of projectiles) {
     for (const enemy of enemies) {
       if (!enemy.dead) {
@@ -135,7 +135,7 @@ export function checkEnemyProjectileCollisions() {
 }
 
 //UPDATE DRAW PROJECTILES
-export function updateDrawProjectiles() {
+function updateDrawProjectiles() {
   for (const projectile of projectiles) {
     projectile.update();
     projectile.draw();
@@ -149,29 +149,29 @@ export function updateDrawProjectiles() {
   );
 }
 //UPDATE DRAW ENEMIES
-export function updateDrawEnemies() {
+function updateDrawEnemies() {
   for (const enemy of enemies) {
     enemy.update();
     enemy.draw();
   }
 }
 //UPDATE DRAW BLOCKS
-export function updateDrawBlocks() {
+function updateDrawBlocks() {
   for (const block of blocks) {
     block.draw();
   }
 }
 //UPDATE DRAW PLAYER
-export function updateDrawPlayer() {
+function updateDrawPlayer() {
   player.update();
   player.draw();
 }
 //CHECK COLLISIONS
-export function checkAllCollisions() {
+function checkAllCollisions() {
   checkEnemyProjectileCollisions();
 }
 //HANDLE KEYDOWN
-export function handleKeyDown(e) {
+function handleKeyDown(e) {
   switch (e.key) {
     case "w":
       keys.w = true;
@@ -191,7 +191,7 @@ export function handleKeyDown(e) {
 }
 //HANDLE KEYUP
 
-export function handleKeyUp(e) {
+function handleKeyUp(e) {
   switch (e.key) {
     case "w":
       keys.w = false;
@@ -207,7 +207,7 @@ export function handleKeyUp(e) {
       break;
   }
 }
-export function handleScroll(e) {
+function handleScroll(e) {
   let delta = e.deltaY;
   console.log(delta);
 }

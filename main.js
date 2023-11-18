@@ -1,22 +1,21 @@
-import * as g from './global.js'
-import Block from './model/block.js'
-import Player from './model/player.js'
-import Keys from './model/keys.js'
-import Enemy from './model/enemy.js'
-import Projectile from './model/projectile.js'
+import Block from '/model/block.js'
+import Player from '/model/player.js'
+import Keys from '/model/keys.js'
+import Enemy from '/model/enemy.js'
+import Projectile from '/model/projectile.js'
 
 function animation() {
-  if (!g.paused) {
-    g.ctx.clearRect(0, 0, g.canvas.width, g.canvas.height);
-    g.ctx.drawImage(g.backgroundImage, 0, 0, g.canvas.width, g.canvas.height);
+  if (!paused) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
     
-    g.checkAllCollisions();
-    g.updateDrawBlocks();
-    g.updateDrawEnemies();
-    g.updateDrawProjectiles();
-    g.updateDrawPlayer();
+    checkAllCollisions();
+    updateDrawBlocks();
+    updateDrawEnemies();
+    updateDrawProjectiles();
+    updateDrawPlayer();
     
-    g.frame++;
+    frame++;
   }
   /* setTimeout(() => {
     requestAnimationFrame(animation);
@@ -25,23 +24,23 @@ function animation() {
 
 onload = () => {
   
-  g.newGame()
+  newGame()
   
-  addEventListener("keydown", g.handleKeyDown)
-  addEventListener("keyup", g.handleKeyUp);
+  addEventListener("keydown", handleKeyDown)
+  addEventListener("keyup", handleKeyUp);
   addEventListener("mousedown", (e) => {
-    g.keys.click = true;
+    keys.click = true;
   });
   addEventListener("mouseup", (e) => {
-    g.keys.click = false;
+    keys.click = false;
   });
   canvas.addEventListener("mousemove", function (event) {
-    g.player.aim.x = event.clientX - g.canvas.getBoundingClientRect().left;
-    g.player.aim.y = event.clientY - g.canvas.getBoundingClientRect().top;
+    player.aim.x = event.clientX - canvas.getBoundingClientRect().left;
+    player.aim.y = event.clientY - canvas.getBoundingClientRect().top;
   });
-  window.addEventListener('wheel', g.handleScroll);
-  g.canvas.style.cursor = "url('./img/aim_red.cur'), auto";
+  window.addEventListener('wheel', handleScroll);
+  canvas.style.cursor = "url('./img/aim_red.cur'), auto";
   //animation();
-  setInterval(animation, 1000 / g.fps);
+  setInterval(animation, 1000 / fps);
   //cambiar este setinterval por requestanimationframe cuando esté todo bien
 };

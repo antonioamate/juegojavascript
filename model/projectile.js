@@ -1,8 +1,8 @@
-import * as global from "./global.js";
-import Block from "./model/block.js";
-import Player from "./model/player.js";
-import Keys from "./model/keys.js";
-import Enemy from "./model/enemy.js";
+
+import Block from "/model/block.js";
+import Player from "/model/player.js";
+import Keys from "/model/keys.js";
+import Enemy from "/model/enemy.js";
 
 export default class Projectile {
   constructor({ position, target, angle }) {
@@ -34,15 +34,15 @@ export default class Projectile {
   }
 
   draw() {
-    g.ctx.fillStyle = "yellow";
-    g.ctx.save();
-    g.ctx.translate(this.position.x + this.size.width / 2, this.position.y + this.size.height / 2);
-    g.ctx.rotate(this.angle);
-    g.ctx.fillRect(-this.size.width / 2, -this.size.height / 2, this.size.width, this.size.height);
-    g.ctx.restore();
-    g.ctx.fillStyle = "cyan";
+    ctx.fillStyle = "yellow";
+    ctx.save();
+    ctx.translate(this.position.x + this.size.width / 2, this.position.y + this.size.height / 2);
+    ctx.rotate(this.angle);
+    ctx.fillRect(-this.size.width / 2, -this.size.height / 2, this.size.width, this.size.height);
+    ctx.restore();
+    ctx.fillStyle = "cyan";
     //dibujar la hitbox de la bala
-    //g.ctx.fillRect(this.hitbox.position.x, this.hitbox.position.y, this.hitbox.size.width, this.hitbox.size.height);
+    //ctx.fillRect(this.hitbox.position.x, this.hitbox.position.y, this.hitbox.size.width, this.hitbox.size.height);
   }
 
   update() {
@@ -52,14 +52,14 @@ export default class Projectile {
     this.hitbox.position.x = this.position.x + this.size.width / 2 - this.hitbox.size.width / 2;
     this.hitbox.position.y = this.position.y;
     //comprobar si está colisionando con bloques
-    for (const block of g.blocks) {
+    for (const block of blocks) {
       if (
         this.hitbox.position.x < block.position.x + block.size.width &&
         this.hitbox.position.x + this.hitbox.size.width > block.position.x &&
         this.hitbox.position.y < block.position.y + block.size.height &&
         this.hitbox.position.y + this.hitbox.size.height > block.position.y
       ) {
-        g.removeProjectile(this);
+        removeProjectile(this);
       }
     }
   }
