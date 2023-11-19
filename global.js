@@ -1,16 +1,4 @@
-let player,
-  enemies,
-  interval,
-  ctx,
-  canvas,
-  backgroundImage,
-  projectiles,
-  keys,
-  paused,
-  fps,
-  gravity,
-  frame,
-  killCount;
+let player, enemies, interval, ctx, canvas, backgroundImage, projectiles, keys, paused, fps, gravity, frame, killCount;
 const blocks = [
   new Block({
     position: { x: 400, y: 440 },
@@ -22,17 +10,7 @@ const blocks = [
   }),
 ];
 
-const playerDeathSounds = [
-  "wasted",
-  "windowsxp",
-  "mariodeath",
-  "astronomia",
-  "funeral",
-  "justdeath",
-  "rickroll",
-  "coolstory",
-  "estudiar",
-];
+const playerDeathSounds = ["wasted", "windowsxp", "mariodeath", "astronomia", "funeral", "justdeath", "rickroll", "coolstory", "estudiar"];
 const enemyDeathSounds = ["windowsxp"];
 const jumpSounds = ["mariojump", "uwu", "kasumi-jump"];
 
@@ -60,19 +38,17 @@ function newGame() {
 }
 
 //BARRERAS INVISIBLES
-function comprobarBarrerasInvisibles(object) {
-  if (object.hitbox.position.y + object.speed.y > 414) {
-    object.hitbox.position.y = 414;
-    object.speed.y = 0;
+function checkGameBorders(object) {
+  console.log(object.position.x)
+  if (object.position.y > 414) {
+    object.position.y = 414;
     object.onGround = true;
   }
-  if (object.hitbox.position.x + object.speed.x < 0) {
-    object.speed.x = 0;
-    object.hitbox.position.x = 0;
+  if (object.position.x + object.hitboxOffset.x < 0) {
+    object.position.x = -object.hitboxOffset.x
   }
-  if (object.hitbox.position.x + object.hitbox.size.width + object.speed.x > 1280) {
-    object.speed.x = 0;
-    object.hitbox.position.x = 1280 - object.hitbox.size.width;
+  if (object.position.x + object.hitboxOffset.x + object.size.width + object.hitboxOffset.width > 1280) {
+    object.position.x = 1280  - object.hitboxOffset.x - object.hitboxOffset.width - object.size.width
   }
 }
 
@@ -90,51 +66,91 @@ function removeProjectile(projectile) {
     projectiles.splice(index, 1);
   }
 }
-//ENEMY BLOCK COLLISIONS
-for (const block of blocks) {
-  if (
-    this.hitbox.position.x + this.speed.x < block.position.x + block.size.width &&
-    this.hitbox.position.x + this.hitbox.size.width + this.speed.x > block.position.x &&
-    this.hitbox.position.y + this.speed.y < block.position.y + block.size.height &&
-    this.hitbox.position.y + this.hitbox.size.height + this.speed.y > block.position.y
-  ) {
-    this.speed.x = 0;
-    this.speed.y = 0;
+
+//WILL COLLIDE?
+function isColliding(o1, o2) {
+  let o1auxX = o1.position.x + (o1.hitboxOffset?.x ?? 0);
+  let o1auxY = o1.position.y + (o1.hitboxOffset?.y ?? 0);
+  let o1auxWidth = o1.size.width + (o1.hitboxOffset?.width ?? 0);
+  let o1auxHeight = o1.size.height + (o1.hitboxOffset?.height ?? 0);
+  let o2auxX = o2.position.x + (o2.hitboxOffset?.x ?? 0);
+  let o2auxY = o2.position.y + (o2.hitboxOffset?.y ?? 0);
+  let o2auxWidth = o2.size.width + (o2.hitboxOffset?.width ?? 0);
+  let o2auxHeight = o2.size.height + (o2.hitboxOffset?.height ?? 0);
+
+  return o1auxX < o2auxX + o2auxWidth && o1auxX + o1auxWidth > o2auxX && o1auxY < o2auxY + o2auxHeight && o1auxY + o1auxHeight > o2auxY;
+}
+
+
+function reactToCollision(block) {
+  if (player.lastPosition.y + player.lastHitboxOffset.y + player.lastHitboxOffset.height < block.position.y) {
+    player.position.y = block.position.y + player.hitboxOffset.height - player.hitboxOffset.y;
+    player.speed.y = 0;
   }
 }
+
 //PLAYER BLOCK COLLISIONS
 function checkPlayerBlockCollisions() {
   for (const block of blocks) {
-    if (
-      player.hitbox.position.x + player.speed.x < block.position.x + block.size.width &&
-      player.hitbox.position.x + player.hitbox.size.width + player.speed.x > block.position.x &&
-      player.hitbox.position.y < block.position.y + block.size.height &&
-      player.hitbox.position.y + player.hitbox.size.height > block.position.y
-    ) {
-      // Manejar la colisión del jugador con el bloque aquí
-      console.log("colision");
-      player.speed.x = 0;
-      player.speed.y = 0;
+    if (isColliding(player, block)) {
+      console.log("player block colission");
+      reactToCollision(block);
+    }
+  }
+}
+//PLAYER COLLISIONS
+function checkPlayerCollisions() {
+  checkGameBorders(player);
+  checkPlayerBlockCollisions();
+}
+//PLAYER ENEMY COLLISION
+if (isColliding(player, enemy)) {
+  //comprobar si el enemigo nos ha hecho daño hace más de medio segundo
+  if (frame - this.lastBite > 30) {
+    //morder al jugador
+    console.log("player got bite");
+    enemy.lastBite = frame;
+    player.health -= 5;
+    //dependiendo de la posición del jugador con respecto al enemigo se empuja al jugador a la izquierda o la derecha y siempre un poco hacia arriba
+    if (player.position.x+player.hitboxOffset.x > enemy.hitboxOffset.x) {
+      player.speed.x += 20;
+      player.speed.y -= 20;
+    } else {
+      player.speed.x -= 20;
+      player.speed.y -= 20;
     }
   }
 }
 
-//ENEMY PROJECTILE COLLISIONS
-function checkEnemyProjectileCollisions() {
-  for (const projectile of projectiles) {
-    for (const enemy of enemies) {
-      if (!enemy.dead) {
-        if (
-          projectile.hitbox.position.x < enemy.hitbox.position.x + enemy.hitbox.size.width &&
-          projectile.hitbox.position.x + projectile.hitbox.size.width > enemy.hitbox.position.x &&
-          projectile.hitbox.position.y < enemy.hitbox.position.y + enemy.hitbox.size.height &&
-          projectile.hitbox.position.y + projectile.hitbox.size.height > enemy.hitbox.position.y
-        ) {
-          enemy.health -= projectile.damage;
-          removeProjectile(projectile);
-          console.log("enemigo alcanzado");
-        }
+//ENEMY COLLISIONS
+function checkEnemyCollisions(enemy) {
+  if (!enemy.dead) {
+    //ENEMY PROJECTILE COLLISIONS
+    for (const projectile of projectiles) {
+      if (isColliding(projectile, enemy)) {
+        enemy.health -= projectile.damage;
+        removeProjectile(projectile);
+        console.log("enemy got shot");
       }
+    }
+
+    //ENEMY BLOCK COLLISIONS
+    for (const block of blocks) {
+      if (isColliding(enemy, block)) {
+        console.log("enemy block colission");
+        enemy.speed.x = 0;
+        enemy.speed.y = 0;
+      }
+    }
+    //ENEMY GAME BORDERS COLLISION
+    checkGameBorders(enemy);
+  }
+}
+//PROJECTILE BLOCK COLLISIONS
+function checkProjectileBlockCollisions(projectile) {
+  for (const block of blocks) {
+    if (isColliding(projectile, block)) {
+      removeProjectile(projectile);
     }
   }
 }
@@ -145,13 +161,7 @@ function updateDrawProjectiles() {
     projectile.update();
     projectile.draw();
   }
-  projectiles = projectiles.filter(
-    (projectile) =>
-      projectile.position.x > 0 &&
-      projectile.position.x < canvas.width &&
-      projectile.position.y > 0 &&
-      projectile.position.y < canvas.height
-  );
+  projectiles = projectiles.filter((projectile) => projectile.position.x > 0 && projectile.position.x < canvas.width && projectile.position.y > 0 && projectile.position.y < canvas.height);
 }
 //UPDATE DRAW ENEMIES
 function updateDrawEnemies() {
@@ -171,10 +181,7 @@ function updateDrawPlayer() {
   player.update();
   player.draw();
 }
-//CHECK COLLISIONS
-function checkAllCollisions() {
-  checkEnemyProjectileCollisions();
-}
+
 //HANDLE KEYDOWN
 function handleKeyDown(e) {
   switch (e.key) {

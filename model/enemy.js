@@ -1,15 +1,11 @@
 class Enemy {
   constructor() {
     this.lastBite = 0;
-    this.hitbox = {
-      position: {
-        x: 0,
-        y: 0,
-      },
-      size: {
-        width: 0,
-        height: 0,
-      },
+    this.hitboxOffset = {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
     };
     this.health = 100;
     this.dead = false;
@@ -37,12 +33,7 @@ class Enemy {
 
   draw() {
     ctx.fillStyle = "rgba(0, 255, 0,0.5)";
-    ctx.fillRect(
-      this.hitbox.position.x,
-      this.hitbox.position.y,
-      this.hitbox.size.width,
-      this.hitbox.size.height
-    );
+    ctx.fillRect(this.position.x+this.hitboxOffset.x, this.hitboxOffset.y+this.position.y, this.size.width + this.hitboxOffset.width, this.size.height + this.hitboxOffset.height);
     ctx.fillStyle = "rgba(255, 0, 0,0.2)";
     ctx.fillRect(this.position.x, this.position.y, 100, 125);
     ctx.drawImage(
@@ -81,52 +72,29 @@ class Enemy {
         enemies.push(new Enemy());
       }
     } else {
-      //moverse en la dirección del jugador y mover la hitbox
-      if (player.position.x <= this.position.x) {
+      this.nextAnimationFrame();
+      //moverse en la dirección del jugador y mover la hitbox segun la posición
+      if (player.position.x + 30 < this.position.x) {
         this.speed.x -= this.acceleration;
         this.animation = 0;
-        this.hitbox.position.x = this.position.x + 40;
-        this.hitbox.position.y = this.position.y;
-        this.hitbox.size.width = this.size.width - 80;
-        this.hitbox.size.height = this.size.height;
       }
-      if (player.position.x > this.position.x) {
+      if (player.position.x - 30 > this.position.x) {
         this.speed.x += this.acceleration;
         this.animation = 1;
-        this.hitbox.position.x = this.position.x + 40;
-        this.hitbox.position.y = this.position.y;
-        this.hitbox.size.width = this.size.width - 80;
-        this.hitbox.size.height = this.size.height;
       }
-      //comprobar colisiones del enemigo con todos los bloques
-      
-      //comprobar si colisiona con el jugador
-      if (
-        player.hitbox.position.x < this.hitbox.position.x + this.hitbox.size.width &&
-        player.hitbox.position.x + player.hitbox.size.width > this.hitbox.position.x &&
-        player.hitbox.position.y < this.hitbox.position.y + this.hitbox.size.height &&
-        player.hitbox.position.y + player.hitbox.size.height > this.hitbox.position.y
-        ) {
-        //comprobar si el enemigo nos ha hecho daño hace más de medio segundo
-        if (frame - this.lastBite > 30) {
-          //morder al jugador
-          this.lastBite = frame;
-          player.health -= 5;
-        }
-      }
-      this.nextAnimationFrame();
 
-      //aplicar gravedad
+
       this.speed.y += gravity;
-
-      comprobarBarrerasInvisibles(this);
 
       //actualizar posición
       this.position.y += this.speed.y;
       this.position.x += this.speed.x;
-      //a partir de la posición del jugador obtengo
+
+      checkEnemyCollisions(this);
+
     }
   }
+
   nextAnimationFrame() {
     if (frame % 8 === 0) {
       if (this.frame < 7) {

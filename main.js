@@ -3,10 +3,10 @@ function animation() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
     
-    checkAllCollisions();
+
     updateDrawBlocks();
-    updateDrawEnemies();
     updateDrawProjectiles();
+    updateDrawEnemies();
     updateDrawPlayer();
     
     frame++;
