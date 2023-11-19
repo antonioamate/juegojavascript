@@ -4,16 +4,16 @@ function animation() {
     ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
     
 
-    updateDrawBlocks();
     updateDrawProjectiles();
+    updateDrawBlocks();
     updateDrawEnemies();
     updateDrawPlayer();
     
     frame++;
   }
-  /* setTimeout(() => {
+
     requestAnimationFrame(animation);
-  }, 1000 / fps); */
+
 }
 
 onload = () => {
@@ -35,6 +35,6 @@ onload = () => {
   window.addEventListener('wheel', handleScroll);
   canvas.style.cursor = "url('./img/aim_red.cur'), auto";
   //animation();
-  setInterval(animation, 1000 / fps);
+  animation()
   //cambiar este setinterval por requestanimationframe cuando esté todo bien
 };

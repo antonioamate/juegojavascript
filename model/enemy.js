@@ -1,24 +1,13 @@
 class Enemy {
   constructor() {
     this.lastBite = 0;
-    this.hitboxOffset = {
-      x: 0,
-      y: 0,
-      width: 0,
-      height: 0,
-    };
     this.health = 100;
     this.dead = false;
     this.deathTime = 0;
-    this.position = {
-      x: Math.random() * 1270,
-      y: 100,
-    };
-    this.size = {
-      width: 100,
-      height: 125,
-    };
-
+    this.x= Math.random() * 1270;
+    this.y= 100;
+    this.width= 100;
+    this.height= 125;
     this.image = new Image();
     this.image.src = "./img/spriteenemy.png";
     this.speed = {
@@ -33,27 +22,24 @@ class Enemy {
 
   draw() {
     ctx.fillStyle = "rgba(0, 255, 0,0.5)";
-    ctx.fillRect(this.position.x+this.hitboxOffset.x, this.hitboxOffset.y+this.position.y, this.size.width + this.hitboxOffset.width, this.size.height + this.hitboxOffset.height);
+    ctx.fillRect(this.x+this.hitboxOffset.x, this.hitboxOffset.y+this.y, this.size.width + this.hitboxOffset.width, this.size.height + this.hitboxOffset.height);
     ctx.fillStyle = "rgba(255, 0, 0,0.2)";
-    ctx.fillRect(this.position.x, this.position.y, 100, 125);
+    ctx.fillRect(this.x, this.y, 100, 125);
     ctx.drawImage(
       this.image,
       this.frame * 100, //por donde empieza a recortar la imagen
       this.animation * 125,
       100, //lo que recorta de la imagen fuente
       125,
-      this.position.x, //donde pone la imagen
-      this.position.y,
+      this.x, //donde pone la imagen
+      this.y,
       100, //dimensiones de la imagen a dibujar (dejarlo igual)
       125
     );
   }
   update() {
     this.speed.x = 0;
-    if (frame % (Math.floor(Math.random() * 1500) + 120) === 0) {
-      const audio = new Audio("./sounds/zombie.mp3");
-      audio.play();
-    }
+    
     if (!this.dead && this.health <= 0) {
       //en el momento en el que lo matan estaba vivo y es la primera vez que se muere
       //si está muerto no se puede morir más y se guarda la hora de la defunción
@@ -62,23 +48,25 @@ class Enemy {
       this.dead = true;
       this.deathTime = frame;
       this.frame = 0;
-      randomSound(deathSoundsEnemy);
+      randomSound(enemyDeathSounds);
     } else if (this.dead) {
       this.nextFrameDead();
       if (frame - this.deathTime > 300) {
         //aquí tiene que desaparecer el cadaver (o no)
         removeEnemy(this);
-        enemies.push(new Enemy());
-        enemies.push(new Enemy());
       }
     } else {
+      if (frame % (Math.floor(Math.random() * 1500) + 120) === 0) {
+        const audio = new Audio("./sounds/zombie.mp3");
+        audio.play();
+      }
       this.nextAnimationFrame();
       //moverse en la dirección del jugador y mover la hitbox segun la posición
-      if (player.position.x + 30 < this.position.x) {
+      if (player.x + 30 < this.x) {
         this.speed.x -= this.acceleration;
         this.animation = 0;
       }
-      if (player.position.x - 30 > this.position.x) {
+      if (player.x - 30 > this.x) {
         this.speed.x += this.acceleration;
         this.animation = 1;
       }
@@ -87,8 +75,8 @@ class Enemy {
       this.speed.y += gravity;
 
       //actualizar posición
-      this.position.y += this.speed.y;
-      this.position.x += this.speed.x;
+      this.y += this.speed.y;
+      this.x += this.speed.x;
 
       checkEnemyCollisions(this);
 

@@ -1,5 +1,5 @@
 class Projectile {
-  constructor({ position, target, angle }) {
+  constructor({ x, y, target, angle }) {
     this.hitbox = {
       position: {
         x: 0,
@@ -11,42 +11,49 @@ class Projectile {
       },
     };
     this.damage = 20;
-    this.position = {
-      x: position.x,
-      y: position.y,
-    };
+    this.x = x;
+    this.y = y;
     this.target = {
       x: target.x,
       y: target.y,
     };
     this.speed = 20;
-    this.size = {
-      width: 10,
-      height: 2,
-    };
+    this.width = 10;
+    this.height = 2;
     this.angle = angle;
   }
 
   draw() {
     ctx.fillStyle = "yellow";
     ctx.save();
-    ctx.translate(this.position.x + this.size.width / 2, this.position.y + this.size.height / 2);
+    ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
     ctx.rotate(this.angle);
-    ctx.fillRect(-this.size.width / 2, -this.size.height / 2, this.size.width, this.size.height);
+    ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
     ctx.restore();
     //ctx.fillStyle = "cyan";
     //dibujar la hitbox de la bala
-    //ctx.fillRect(this.hitbox.position.x, this.hitbox.position.y, this.hitbox.size.width, this.hitbox.size.height);
+    //ctx.fillRect(this.x, this.y, this.width, this.height);
   }
 
   update() {
-    
-    this.position.x += this.speed * Math.cos(this.angle);
-    this.position.y += this.speed * Math.sin(this.angle);
-    
-    this.hitbox.position.x = this.position.x + this.size.width / 2 - this.hitbox.size.width / 2;
-    this.hitbox.position.y = this.position.y;
+    this.x += this.speed * Math.cos(this.angle);
+    this.y += this.speed * Math.sin(this.angle);
+
     //comprobar si está colisionando con bloques
-    checkProjectileBlockCollisions(this)
+    for (const block of blocks) {
+      if (isColliding(this, block)) {
+        removeProjectile(this);
+        console.log("block got shot");
+        return;
+      }
+    }
+    for (const enemy of enemies) {
+      if (isColliding(this, enemy)) {
+        enemy.health -= this.damage;
+        removeProjectile(this);
+        console.log("enemy got shot");
+        return;
+      }
+    }
   }
 }

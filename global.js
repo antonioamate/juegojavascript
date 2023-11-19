@@ -1,12 +1,10 @@
 let player, enemies, interval, ctx, canvas, backgroundImage, projectiles, keys, paused, fps, gravity, frame, killCount;
 const blocks = [
   new Block({
-    position: { x: 400, y: 440 },
-    size: { width: 50, height: 100 },
-  }),
-  new Block({
-    position: { x: 200, y: 200 },
-    size: { width: 50, height: 100 },
+    x: 200,
+    y: 440,
+    width: 50,
+    height: 100,
   }),
 ];
 
@@ -31,7 +29,6 @@ function newGame() {
   killCount = 0;
   frame = 0;
   enemies = [];
-  enemies.push(new Enemy());
   projectiles = [];
   paused = false;
   player = new Player();
@@ -39,85 +36,93 @@ function newGame() {
 
 //BARRERAS INVISIBLES
 function checkGameBorders(object) {
-  console.log(object.position.x)
-  if (object.position.y > 414) {
-    object.position.y = 414;
+  if (object.y + object.height + object.speed.y >= 540) {
+    object.y = 540 - object.height;
+    object.speed.y = 0;
     object.onGround = true;
   }
-  if (object.position.x + object.hitboxOffset.x < 0) {
-    object.position.x = -object.hitboxOffset.x
+  if (object.x + object.speed.x < 0) {
+    object.x = 0;
+    object.speed.x = 0;
   }
-  if (object.position.x + object.hitboxOffset.x + object.size.width + object.hitboxOffset.width > 1280) {
-    object.position.x = 1280  - object.hitboxOffset.x - object.hitboxOffset.width - object.size.width
-  }
-}
-
-//REMOVE ENEMY
-function removeEnemy(enemy) {
-  const index = enemies.indexOf(enemy);
-  if (index !== -1) {
-    enemies.splice(index, 1);
-  }
-}
-//REMOVE PROJECTILE
-function removeProjectile(projectile) {
-  const index = projectiles.indexOf(projectile);
-  if (index !== -1) {
-    projectiles.splice(index, 1);
+  if (object.x + object.width + object.speed.x >= 1280) {
+    object.x = 1280 - object.width;
+    object.speed.x = 0;
   }
 }
 
-//WILL COLLIDE?
+//IS COLLIDING
 function isColliding(o1, o2) {
-  let o1auxX = o1.position.x + (o1.hitboxOffset?.x ?? 0);
-  let o1auxY = o1.position.y + (o1.hitboxOffset?.y ?? 0);
-  let o1auxWidth = o1.size.width + (o1.hitboxOffset?.width ?? 0);
-  let o1auxHeight = o1.size.height + (o1.hitboxOffset?.height ?? 0);
-  let o2auxX = o2.position.x + (o2.hitboxOffset?.x ?? 0);
-  let o2auxY = o2.position.y + (o2.hitboxOffset?.y ?? 0);
-  let o2auxWidth = o2.size.width + (o2.hitboxOffset?.width ?? 0);
-  let o2auxHeight = o2.size.height + (o2.hitboxOffset?.height ?? 0);
-
-  return o1auxX < o2auxX + o2auxWidth && o1auxX + o1auxWidth > o2auxX && o1auxY < o2auxY + o2auxHeight && o1auxY + o1auxHeight > o2auxY;
-}
-
-
-function reactToCollision(block) {
-  if (player.lastPosition.y + player.lastHitboxOffset.y + player.lastHitboxOffset.height < block.position.y) {
-    player.position.y = block.position.y + player.hitboxOffset.height - player.hitboxOffset.y;
-    player.speed.y = 0;
-  }
+  return (
+    o1.x + o1.speed.x < o2.x + o2.width &&
+    o1.x + o1.width + o1.speed.x > o2.x &&
+    o1.y + o1.speed.y < o2.y + o2.height &&
+    o1.y + o1.height + o1.speed.y > o2.y
+  );
 }
 
 //PLAYER BLOCK COLLISIONS
 function checkPlayerBlockCollisions() {
   for (const block of blocks) {
-    if (isColliding(player, block)) {
-      console.log("player block colission");
-      reactToCollision(block);
+    // Colisión desde arriba
+    if (player.speed.y > 0 && player.y + player.height + player.speed.y >= block.y && player.x + player.width >= block.x && player.x <= block.x + block.width) {
+      player.y = block.y - player.height;
+      player.speed.y = 0;
+      player.onGround = true;
+    }
+
+    // Colisión desde la izquierda
+    if (
+      player.speed.x < 0 && // Verifica que el jugador se esté moviendo hacia la izquierda
+      player.x + player.speed.x <= block.x + block.width && // Colisión desde la izquierda
+      player.x >= block.x &&
+      player.y + player.height >= block.y &&
+      player.y <= block.y + block.height
+    ) {
+      player.x = block.x + block.width;
+      player.speed.x = 0;
+    }
+
+    // Colisión desde la derecha
+    if (
+      player.speed.x > 0 && // Verifica que el jugador se esté moviendo hacia la derecha
+      player.x + player.width + player.speed.x >= block.x && // Colisión desde la derecha
+      player.x <= block.x + block.width &&
+      player.y + player.height >= block.y &&
+      player.y <= block.y + block.height
+    ) {
+      player.x = block.x - player.width;
+      player.speed.x = 0;
     }
   }
 }
+
 //PLAYER COLLISIONS
 function checkPlayerCollisions() {
   checkGameBorders(player);
   checkPlayerBlockCollisions();
 }
 //PLAYER ENEMY COLLISION
-if (isColliding(player, enemy)) {
-  //comprobar si el enemigo nos ha hecho daño hace más de medio segundo
-  if (frame - this.lastBite > 30) {
-    //morder al jugador
-    console.log("player got bite");
-    enemy.lastBite = frame;
-    player.health -= 5;
-    //dependiendo de la posición del jugador con respecto al enemigo se empuja al jugador a la izquierda o la derecha y siempre un poco hacia arriba
-    if (player.position.x+player.hitboxOffset.x > enemy.hitboxOffset.x) {
-      player.speed.x += 20;
-      player.speed.y -= 20;
-    } else {
-      player.speed.x -= 20;
-      player.speed.y -= 20;
+function checkPlayerEnemyCollisions() {
+  for (const enemy of enemies) {
+    if (isColliding(player, enemy)) {
+      //comprobar si el enemigo nos ha hecho daño hace más de medio segundo
+      if (frame - this.lastBite > 30) {
+        //morder al jugador
+        console.log("player got bite");
+        enemy.lastBite = frame;
+        player.health -= 5;
+        //dependiendo de la posición del jugador con respecto al enemigo
+        //se empuja al jugador a la izquierda o la derecha y siempre un poco hacia arriba
+        if (player.x > enemy.x) {
+          player.speed.x += 20;
+          player.speed.y -= 20;
+        } else {
+          player.speed.x -= 20;
+          a;
+          player.speed.y -= 20;
+        }
+      }
     }
   }
 }
@@ -126,32 +131,16 @@ if (isColliding(player, enemy)) {
 function checkEnemyCollisions(enemy) {
   if (!enemy.dead) {
     //ENEMY PROJECTILE COLLISIONS
-    for (const projectile of projectiles) {
-      if (isColliding(projectile, enemy)) {
-        enemy.health -= projectile.damage;
-        removeProjectile(projectile);
-        console.log("enemy got shot");
-      }
-    }
 
     //ENEMY BLOCK COLLISIONS
     for (const block of blocks) {
       if (isColliding(enemy, block)) {
         console.log("enemy block colission");
-        enemy.speed.x = 0;
-        enemy.speed.y = 0;
+        reactToCollision(enemy, block);
       }
     }
     //ENEMY GAME BORDERS COLLISION
     checkGameBorders(enemy);
-  }
-}
-//PROJECTILE BLOCK COLLISIONS
-function checkProjectileBlockCollisions(projectile) {
-  for (const block of blocks) {
-    if (isColliding(projectile, block)) {
-      removeProjectile(projectile);
-    }
   }
 }
 
@@ -161,8 +150,9 @@ function updateDrawProjectiles() {
     projectile.update();
     projectile.draw();
   }
-  projectiles = projectiles.filter((projectile) => projectile.position.x > 0 && projectile.position.x < canvas.width && projectile.position.y > 0 && projectile.position.y < canvas.height);
+  projectiles = projectiles.filter((projectile) => projectile.x > 0 && projectile.x < canvas.width && projectile.y > 0 && projectile.y < canvas.height);
 }
+
 //UPDATE DRAW ENEMIES
 function updateDrawEnemies() {
   for (const enemy of enemies) {
@@ -223,4 +213,19 @@ function handleKeyUp(e) {
 function handleScroll(e) {
   let delta = e.deltaY;
   console.log(delta);
+}
+
+//REMOVE ENEMY
+function removeEnemy(enemy) {
+  const index = enemies.indexOf(enemy);
+  if (index !== -1) {
+    enemies.splice(index, 1);
+  }
+}
+//REMOVE PROJECTILE
+function removeProjectile(projectile) {
+  const index = projectiles.indexOf(projectile);
+  if (index !== -1) {
+    projectiles.splice(index, 1);
+  }
 }
