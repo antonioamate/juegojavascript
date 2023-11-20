@@ -1,4 +1,4 @@
-let player, enemies, interval, ctx, canvas, backgroundImage, projectiles, keys, paused, fps, gravity, frame, killCount, wave, escaped;
+let player, enemies, interval, ctx, canvas, backgroundImage, projectiles, keys, paused, fps, gravity, frame, killCount, wave, escaped, music;
 const blocks = [
   new Block({
     x: 0,
@@ -20,43 +20,47 @@ const blocks = [
   }),
 ];
 
-const playerDeathSounds = ["wasted", "windowsxp", "mariodeath", "astronomia", "funeral", "justdeath", "rickroll", "coolstory", "estudiar"];
+const playerDeathSounds = ["fatality","wasted", "windowsxp", "mariodeath", "astronomia", "funeral", "justdeath", "rickroll", "coolstory", "estudiar", "titanicflute"];
 const enemyDeathSounds = ["death-skeleton"];
 const enemyHitSounds = ["hurt1-skeleton", "hurt2-skeleton", "hurt3-skeleton", "hurt4-skeleton"];
 const playerHitSounds = ["minecrafthit", "punch", "minecraft-hurt"];
 const jumpSounds = ["mariojump"];
 const bulletWoodSounds = ["bulletwood"];
 const newWaveSounds = ["anenemy"];
+const endWaveSounds = [];
 const newGameSounds = ["herewegoagain"];
-const beggingSounds = ["nogod"];
+const beggingSounds = ["nogod", "nonono"];
 
 function randomSound(array) {
   let index = Math.floor(Math.random() * array.length);
   const audio = new Audio("./sounds/" + array[index] + ".mp3");
   audio.play();
+  return audio;
 }
 
 function newGame() {
-  
   escaped = 0;
   wave = 0;
-  canvas = document.getElementById("canvas");
-  ctx = canvas.getContext("2d");
-  backgroundImage = new Image();
-  backgroundImage.src = "./img/forest.jpg";
-  keys = new Keys();
-  fps = 60;
-  gravity = 0.3;
   killCount = 0;
-  frame = 0;
   enemies = [];
-  
-  projectiles = [];
   paused = false;
   player = new Player();
 }
-function newWave() {
+function drawData() {
+  ctx.fillStyle = "#000";
+  ctx.fillRect(20, 680, 200, 20);
+  ctx.fillStyle = player.health > 33 ? "#33cc33" : "#cc0000";
+  ctx.fillRect(20, 680, player.health * 2, 20);
+  ctx.font = "30px Arial";
+  ctx.fillStyle = "white";
+  ctx.fillText(player.health, 230, 700);
+  ctx.fillText("KILL COUNT = " + killCount, 300, 700);
+  ctx.fillText(player.health, 230, 700);
+  ctx.fillText("ESCAPED = " + escaped, 600, 700);
 
+  if (wave > 0) ctx.fillText("WAVE = " + wave, 900, 700);
+}
+function newWave() {
   randomSound(newWaveSounds);
   wave++;
   for (let i = 0; i < wave; i++) {
@@ -83,7 +87,8 @@ function checkGameBorders(object) {
   }
 
   if (object instanceof Enemy && (object.x + object.width < 0 || object.x > 1280)) {
-    escaped++
+    escaped++;
+
     removeEnemy(object);
   }
 }
@@ -120,7 +125,7 @@ function checkPlayerEnemyCollisions() {
         if (frame - enemy.lastBite > 30) {
           //morder al jugador
           console.log("player got bite");
-          randomSound(playerHitSounds)
+          randomSound(playerHitSounds);
           enemy.lastBite = frame;
           player.health -= 20;
           //dependiendo de la posición del jugador con respecto al enemigo
@@ -193,8 +198,13 @@ function handleKeyDown(e) {
       break;
     case "p":
       paused = !paused;
+      break;
     case "e":
       player.currentGun.gunPistol = !player.currentGun.gunPistol;
+      break;
+    case "m":
+      music.volume = (music.volume>0) ? music.volume=0 : music.volume = 1;
+      break;
   }
 }
 //HANDLE KEYUP
@@ -219,9 +229,11 @@ function handleKeyUp(e) {
 //REMOVE ENEMY
 function removeEnemy(enemy) {
   const index = enemies.indexOf(enemy);
+
   if (index !== -1) {
     enemies.splice(index, 1);
   }
+
   if (enemies.length < 1) {
     newWave();
   }

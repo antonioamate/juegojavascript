@@ -77,6 +77,7 @@ class Player {
   }
 
   update() {
+    if(this.health<0)this.health=0
     this.speed.x = 0;
     //en el momento en el que lo matan estaba vivo y es la primera vez que se muere
     //si está muerto no se puede morir más y se guarda la hora de la defunción
@@ -96,6 +97,8 @@ class Player {
         //aquí se tiene que acabar el juego
       }
     } else {
+      if(frame%60===0)this.health++
+      if(this.health>100)this.health=100
       this.updateCanShoot();
       this.nextFrameGun();
       this.nextAnimationFrame();
