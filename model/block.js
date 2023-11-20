@@ -1,5 +1,5 @@
 class Block {
-  constructor(x, y, width, height) {
+  constructor({x, y, width, height}) {
     this.x = x;
     this.y = y;
     this.width = width;
@@ -7,7 +7,7 @@ class Block {
   }
 
   draw() {
-    ctx.fillStyle = "brown";
+    ctx.fillStyle = "#4e3c2e";
     ctx.fillRect(this.x, this.y, this.width, this.height);
   }
 }

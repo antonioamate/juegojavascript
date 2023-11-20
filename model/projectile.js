@@ -32,6 +32,7 @@ class Projectile {
       if (isColliding(this, block)) {
         removeProjectile(this);
         console.log("block got shot");
+        randomSound(bulletWoodSounds)
         return;
       }
     }
