@@ -21,7 +21,7 @@ const blocks = [
 ];
 
 const playerDeathSounds = ["cr7","fatality", "wasted", "windowsxp", "mariodeath", "astronomia", "funeral", "justdeath", "rickroll", "coolstory", "estudiar", "titanicflute","tobecontinued"];
-const enemyDeathSounds = ["death-skeleton"];
+const enemyDeathSounds = ["death-skeleton","windowsxp","estudiar"];
 const enemyHitSounds = ["hurt1-skeleton", "hurt2-skeleton", "hurt3-skeleton", "hurt4-skeleton"];
 const playerHitSounds = ["minecrafthit", "punch", "minecraft-hurt"];
 const jumpSounds = ["mariojump"];
