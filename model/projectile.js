@@ -1,6 +1,6 @@
 class Projectile {
-  constructor({ x, y, target, angle }) {
-    this.damage = 20;
+  constructor({ x, y, target, angle, damage }) {
+    this.damage = damage;
     this.x = x;
     this.y = y;
     this.target = {
@@ -20,7 +20,6 @@ class Projectile {
     ctx.rotate(this.angle);
     ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
     ctx.restore();
-
   }
 
   update() {
@@ -32,16 +31,18 @@ class Projectile {
       if (isColliding(this, block)) {
         removeProjectile(this);
         console.log("block got shot");
-        randomSound(bulletWoodSounds)
+        randomSound(bulletWoodSounds);
         return;
       }
     }
     for (const enemy of enemies) {
-      if (isColliding(this, enemy)) {
-        enemy.health -= this.damage;
-        removeProjectile(this);
-        console.log("enemy got shot");
-        return;
+      if (!enemy.dead) {
+        if (isColliding(this, enemy)) {
+          enemy.health -= this.damage;
+          removeProjectile(this);
+          console.log("enemy got shot");
+          return;
+        }
       }
     }
   }

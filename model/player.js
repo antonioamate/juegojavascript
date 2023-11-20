@@ -3,37 +3,36 @@ class Player {
     this.health = 100;
     this.dead = false;
     this.deathTime = 0;
-    this.pistol = {
-      canShoot: true,
+    this.currentGun = {
+      gunPistol: false,
       angle: 0,
       x: 300,
       y: 300,
+      shoulderDistance: 45,
+      aimDistance: 0,
+      facingRight: true,
+    };
+    this.pistol = {
+      canShoot: true,
       image: new Image(),
       width: 80,
       height: 48,
       frame: 0,
-      facingRight: true,
       shooting: false,
       lastShotTime: 0,
-      shotCoolDown: 20,
-      shoulderDistance: 45,
-      aimDistance: 0,
+      shotCoolDown: 15,
+      damage: 80,
     };
     this.uzi = {
       canShoot: true,
-      angle: 0,
-      x: 300,
-      y: 300,
       image: new Image(),
-      width: 80,
-      height: 48,
+      width: 60,
+      height: 40,
       frame: 0,
-      facingRight: true,
       shooting: false,
       lastShotTime: 0,
       shotCoolDown: 5,
-      shoulderDistance: 45,
-      aimDistance: 0,
+      damage: 20,
     };
     this.pistol.image.src = "./img/pistol.png";
     this.uzi.image.src = "./img/uzi.png";
@@ -98,7 +97,7 @@ class Player {
       }
     } else {
       this.updateCanShoot();
-      this.nextFramePistol();
+      this.nextFrameGun();
       this.nextAnimationFrame();
 
       this.checkInput();
@@ -110,13 +109,13 @@ class Player {
       this.y += this.speed.y;
       this.x += this.speed.x;
 
-
       this.getArmPistolDimensions();
     }
   }
-  
+
   checkInput() {
-    if (this.pistol.canShoot && keys.click) this.shoot();
+    if (this.pistol.canShoot && keys.click && this.currentGun.gunPistol) this.shoot("0");
+    if (this.uzi.canShoot && keys.click && !this.currentGun.gunPistol) this.shoot("1");
     this.facingRight = this.aim.x < this.x + 22 ? false : true;
     this.facingRight ? this.animationIdleRight() : this.animationIdleLeft();
     if (keys.a) {
@@ -141,25 +140,35 @@ class Player {
     }
   }
 
-  shoot() {
-    this.pistol.canShoot = false;
-    this.pistol.shooting = true;
-    this.pistol.lastShotTime = frame;
-    const audio = new Audio("./sounds/pistolShotCut.mp3");
-    audio.play();
-    let angle = this.pistol.angle;
+  shoot(gun) {
+    if (gun === "0") {
+      this.pistol.canShoot = false;
+      this.pistol.shooting = true;
+      this.pistol.lastShotTime = frame;
+      const audio = new Audio("./sounds/pistolShotCut.mp3");
+      audio.play();
+    } else {
+      this.uzi.canShoot = false;
+      this.uzi.shooting = true;
+      this.uzi.lastShotTime = frame;
+      const audio = new Audio("./sounds/pistolShotCut.mp3");
+      audio.play();
+    }
+    let angle = this.currentGun.angle;
+
     const projectile = new Projectile({
-        x: this.pistol.x,
-        y: this.pistol.y,
+      x: this.currentGun.x,
+      y: this.currentGun.y,
       target: {
         x: this.aim.x,
         y: this.aim.y,
       },
       angle: angle,
+      damage: this.currentGun.gunPistol ? this.pistol.damage : this.uzi.damage,
     });
     projectiles.push(projectile);
   }
-  nextFramePistol() {
+  nextFrameGun() {
     if (this.pistol.shooting) {
       if (this.pistol.frame > 9) {
         //si ha terminado de disparar se para la animación
@@ -169,15 +178,29 @@ class Player {
         this.pistol.frame++;
       }
     }
+    if (this.uzi.shooting) {
+      if (this.uzi.frame > 9) {
+        //si ha terminado de disparar se para la animación
+        this.uzi.frame = 0;
+        this.uzi.shooting = false;
+      } else {
+        this.uzi.frame++;
+      }
+    }
   }
   updateCanShoot() {
     if (frame - this.pistol.lastShotTime > this.pistol.shotCoolDown) this.pistol.canShoot = true;
+    if (frame - this.uzi.lastShotTime > this.uzi.shotCoolDown) this.uzi.canShoot = true;
   }
   draw() {
     this.drawPlayer();
     if (!this.dead) {
       this.drawArm();
-      this.drawPistol();
+      if (this.currentGun.gunPistol) {
+        this.drawPistol();
+      } else {
+        this.drawUzi();
+      }
     }
   }
   animationWalkLeft() {
@@ -221,7 +244,7 @@ class Player {
     //las coordenadas del ratón, y la posición del jugador
     //calcular hombro
     if (this.frame < 5) {
-      this.arm.start.y = this.y + this.arm.offset.y + this.frame ;
+      this.arm.start.y = this.y + this.arm.offset.y + this.frame;
     } else {
       this.arm.start.y = this.y + this.arm.offset.y + 8 - this.frame;
     }
@@ -232,14 +255,14 @@ class Player {
     let armRotation;
     let dx = this.aim.x - this.arm.start.x;
     let dy = this.aim.y - this.arm.start.y;
-    this.pistol.aimDistance = Math.sqrt(dx * dx + dy * dy);
+    this.currentGun.aimDistance = Math.sqrt(dx * dx + dy * dy);
 
-    let normalizedDx = dx / this.pistol.aimDistance;
-    let normalizedDy = dy / this.pistol.aimDistance;
+    let normalizedDx = dx / this.currentGun.aimDistance;
+    let normalizedDy = dy / this.currentGun.aimDistance;
 
-    this.pistol.x = this.arm.start.x + normalizedDx * this.pistol.shoulderDistance;
-    this.pistol.y = this.arm.start.y + normalizedDy * this.pistol.shoulderDistance;
-    this.pistol.angle = Math.atan2(dy, dx);
+    this.currentGun.x = this.arm.start.x + normalizedDx * this.currentGun.shoulderDistance;
+    this.currentGun.y = this.arm.start.y + normalizedDy * this.currentGun.shoulderDistance;
+    this.currentGun.angle = Math.atan2(dy, dx);
 
     //ajustar el brazo segun donde mire el jugador
 
@@ -277,9 +300,9 @@ class Player {
     }
   }
   drawPlayer() {
-    ctx.fillStyle = "rgba(255, 0, 0,0.2)";
-    ctx.fillRect(this.x, this.y, 40, 125);
-    ctx.drawImage(this.image, (this.frame * 100) + 30, this.animation * 125, 40, 125, this.x, this.y, 40, 125);
+    //ctx.fillStyle = "rgba(255, 0, 0,0.2)";
+    //ctx.fillRect(this.x, this.y, 40, 125);
+    ctx.drawImage(this.image, this.frame * 100 + 30, this.animation * 125, 40, 125, this.x, this.y, 40, 125);
   }
   drawArm() {
     //dibujar el brazo
@@ -293,8 +316,8 @@ class Player {
   drawPistol() {
     //dibujar la pistola
     ctx.save();
-    ctx.translate(this.pistol.x, this.pistol.y);
-    ctx.rotate(this.pistol.angle);
+    ctx.translate(this.currentGun.x, this.currentGun.y);
+    ctx.rotate(this.currentGun.angle);
     if (!this.facingRight) ctx.scale(1, -1); // Reflejar horizontalmente
     ctx.drawImage(
       this.pistol.image,
@@ -306,6 +329,30 @@ class Player {
       -48 / 2 + 11,
       80, //dimensiones de la imagen final
       48
+    );
+    // Restablecer el contexto al estado guardado
+    ctx.restore();
+  }
+  drawUzi() {
+    //dibujar la pistola
+    ctx.save();
+    ctx.translate(this.currentGun.x, this.currentGun.y);
+    ctx.rotate(this.currentGun.angle);
+    if (this.facingRight) {
+      ctx.scale(-1, 1);
+    } else {
+      ctx.scale(-1, -1);
+    } // Reflejar horizontalmente
+    ctx.drawImage(
+      this.uzi.image,
+      0, //inicio x
+      40 * this.uzi.frame, //inicio y
+      60, //cuanto cortar de la imagen
+      40,
+      -60 / 2 -10, //posición donde situar la pistola
+      -40 / 2 + 6,
+      60, //dimensiones de la imagen final
+      40
     );
     // Restablecer el contexto al estado guardado
     ctx.restore();

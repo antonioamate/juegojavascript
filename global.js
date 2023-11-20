@@ -1,4 +1,4 @@
-let player, enemies, interval, ctx, canvas, backgroundImage, projectiles, keys, paused, fps, gravity, frame, killCount;
+let player, enemies, interval, ctx, canvas, backgroundImage, projectiles, keys, paused, fps, gravity, frame, killCount, wave;
 const blocks = [
   new Block({
     x: 0,
@@ -32,6 +32,7 @@ function randomSound(array) {
 }
 
 function newGame() {
+  wave = 0;
   canvas = document.getElementById("canvas");
   ctx = canvas.getContext("2d");
   backgroundImage = new Image();
@@ -42,9 +43,16 @@ function newGame() {
   killCount = 0;
   frame = 0;
   enemies = [];
+  newWave();
   projectiles = [];
   paused = false;
   player = new Player();
+}
+function newWave() {
+  wave++;
+  for (let i = 0; i < wave; i++) {
+    enemies.push(new Enemy());
+  }
 }
 
 //BARRERAS INVISIBLES
@@ -71,14 +79,14 @@ function isColliding(o1, o2) {
 
 //PLAYER/ENEMY BLOCK COLLISIONS
 function checkBlockCollisions(object) {
-    for (const block of blocks) {
-      // Colisión desde arriba
-      if (object.y + object.height + object.speed.y >= block.y && object.y + object.height <= block.y && object.x + object.width >= block.x && object.x <= block.x + block.width) {
-        object.y = block.y - object.height;
-        object.speed.y = 0;
-        object.onGround = true;
-      }
+  for (const block of blocks) {
+    // Colisión desde arriba
+    if (object.y + object.height + object.speed.y >= block.y && object.y + object.height <= block.y && object.x + object.width >= block.x && object.x <= block.x + block.width) {
+      object.y = block.y - object.height;
+      object.speed.y = 0;
+      object.onGround = true;
     }
+  }
 }
 
 //PLAYER COLLISIONS
@@ -90,22 +98,24 @@ function checkPlayerCollisions() {
 //PLAYER ENEMY COLLISION
 function checkPlayerEnemyCollisions() {
   for (const enemy of enemies) {
-    if (isColliding(player, enemy)) {
-      //comprobar si el enemigo nos ha hecho daño hace más de medio segundo
-      if (frame - enemy.lastBite > 30) {
-        //morder al jugador
-        console.log("player got bite");
-        enemy.lastBite = frame;
-        player.health -= 5;
-        //dependiendo de la posición del jugador con respecto al enemigo
-        //se empuja al jugador a la izquierda o la derecha y siempre un poco hacia arriba
-        if (player.x > enemy.x) {
-          player.speed.x += 20;
-          player.speed.y -= 20;
-        } else {
-          player.speed.x -= 20;
-          a;
-          player.speed.y -= 20;
+    if (!enemy.dead) {
+      if (isColliding(player, enemy)) {
+        //comprobar si el enemigo nos ha hecho daño hace más de medio segundo
+        if (frame - enemy.lastBite > 30) {
+          //morder al jugador
+          console.log("player got bite");
+          enemy.lastBite = frame;
+          player.health -= 5;
+          //dependiendo de la posición del jugador con respecto al enemigo
+          //se empuja al jugador a la izquierda o la derecha y siempre un poco hacia arriba
+          if (player.x > enemy.x) {
+            player.speed.x += 30;
+            player.speed.y -= 5;
+          } else {
+            player.speed.x -= 30;
+
+            player.speed.y -= 5;
+          }
         }
       }
     }
@@ -166,6 +176,8 @@ function handleKeyDown(e) {
       break;
     case "p":
       paused = !paused;
+    case "e":
+      player.currentGun.gunPistol = !player.currentGun.gunPistol;
   }
 }
 //HANDLE KEYUP
@@ -186,17 +198,15 @@ function handleKeyUp(e) {
       break;
   }
 }
-//HANDLE SCROLL
-function handleScroll(e) {
-  let delta = e.deltaY;
-  console.log(delta);
-}
 
 //REMOVE ENEMY
 function removeEnemy(enemy) {
   const index = enemies.indexOf(enemy);
   if (index !== -1) {
     enemies.splice(index, 1);
+  }
+  if (enemies.length < 1) {
+    newWave();
   }
 }
 //REMOVE PROJECTILE

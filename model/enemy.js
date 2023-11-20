@@ -22,8 +22,8 @@ class Enemy {
 
   draw() {
 
-    ctx.fillStyle = "rgba(255, 0, 0,0.2)";
-    ctx.fillRect(this.x, this.y, this.width, this.height);
+    //ctx.fillStyle = "rgba(255, 0, 0,0.2)";
+    //ctx.fillRect(this.x, this.y, this.width, this.height);
     ctx.drawImage(
       this.image,
       (this.frame * 100)+20, //por donde empieza a recortar la imagen
@@ -47,6 +47,7 @@ class Enemy {
       this.dead = true;
       this.deathTime = frame;
       this.frame = 0;
+      killCount++
       randomSound(enemyDeathSounds);
     } else if (this.dead) {
       this.nextFrameDead();
@@ -72,12 +73,12 @@ class Enemy {
 
 
       this.speed.y += gravity;
+      checkEnemyCollisions(this);
 
       //actualizar posición
       this.y += this.speed.y;
       this.x += this.speed.x;
 
-      checkEnemyCollisions(this);
 
     }
   }

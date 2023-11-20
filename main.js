@@ -17,7 +17,7 @@ onload = () => {
   addEventListener("mouseup", (e) => {
     keys.click = false;
   });
-  window.addEventListener("wheel", handleScroll);
+
 };
 
 function animation() {
