@@ -271,7 +271,7 @@ class Player {
     }
   }
   nextAnimationFrame() {
-    if (frame % 5 === 0) {
+    if (frame % 4 === 0) {
       if (this.frame < 7) {
         this.frame++;
       } else {
