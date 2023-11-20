@@ -9,7 +9,7 @@ onload = () => {
   gravity = 0.3;
   music = new Audio("./sounds/franksinatra.mp3");
   music.loop=true
-  music.play()
+  
   projectiles = [];
   frame = 0;
 
@@ -34,7 +34,8 @@ onload = () => {
 
 function animation() {
   if (!paused) {
-    if (frame === 60) randomSound(newGameSounds);
+    if (frame === 0) randomSound(newGameSounds);
+    if (frame === 200) music.play()
     if (frame === 333) newWave();
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);

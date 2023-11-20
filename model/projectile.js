@@ -18,7 +18,7 @@ class Projectile {
     ctx.save();
     ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
     ctx.rotate(this.angle);
-    ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+    ctx.fillRect(-this.width / 2 , -this.height / 2, this.width, this.height);
     ctx.restore();
   }
 

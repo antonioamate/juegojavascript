@@ -31,8 +31,8 @@ class Player {
       frame: 0,
       shooting: false,
       lastShotTime: 0,
-      shotCoolDown: 5,
-      damage: 20,
+      shotCoolDown: 2,
+      damage: 5,
     };
     this.pistol.image.src = "./img/pistol.png";
     this.uzi.image.src = "./img/uzi.png";
@@ -154,7 +154,7 @@ class Player {
       this.uzi.canShoot = false;
       this.uzi.shooting = true;
       this.uzi.lastShotTime = frame;
-      const audio = new Audio("./sounds/pistolShotCut.mp3");
+      const audio = new Audio("./sounds/uzi.mp3");
       audio.play();
     }
     let angle = this.currentGun.angle;

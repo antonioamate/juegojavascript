@@ -1,4 +1,4 @@
-let player, enemies, interval, ctx, canvas, backgroundImage, projectiles, keys, paused, fps, gravity, frame, killCount, wave, escaped, music;
+let player, enemies, interval, ctx, canvas, backgroundImage, projectiles, keys, paused, fps, gravity, frame, killCount, wave, escaped, music, records;
 const blocks = [
   new Block({
     x: 0,
@@ -244,4 +244,31 @@ function removeProjectile(projectile) {
   if (index !== -1) {
     projectiles.splice(index, 1);
   }
+}
+function updateDrawRecords(){
+  ctx.fillStyle = "#000";
+  ctx.fillRect(20, 680, 200, 20);
+  records=JSON.parse(localStorage.getItem("records"))
+  records.push({
+    playerName: playerName
+  })
+  
+  localStorage.setItem("records",)
+  
+  
+  ctx.fillStyle = "#000";
+  ctx.fillRect(20, 680, 200, 20);
+  ctx.fillStyle = player.health > 33 ? "#33cc33" : "#cc0000";
+  ctx.fillRect(20, 680, player.health * 2, 20);
+  ctx.font = "30px Arial";
+  ctx.fillStyle = "white";
+  ctx.fillText(player.health, 230, 700);
+  ctx.fillText("KILL COUNT = " + killCount, 300, 700);
+  ctx.fillText(player.health, 230, 700);
+  ctx.fillText("ESCAPED = " + escaped, 600, 700);
+
+  if (wave > 0) ctx.fillText("WAVE = " + wave, 900, 700);
+
+
+
 }
