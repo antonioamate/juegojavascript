@@ -1,5 +1,6 @@
 class Enemy {
   constructor() {
+    this.agressive=true
     this.lastBite = 0;
     this.health = 100;
     this.dead = false;
@@ -18,6 +19,7 @@ class Enemy {
     this.animation = 2;
     this.frame = 0;
     this.onGround = true;
+    this.frameCooldown=8
   }
 
   draw() {
@@ -38,6 +40,12 @@ class Enemy {
   }
   update() {
     this.speed.x = 0;
+    if(this.health<=20 && this.agressive){
+      this.agressive=false
+      this.acceleration=3
+      this.frameCooldown=2
+      randomSound(beggingSounds)
+    }
     
     if (!this.dead && this.health <= 0) {
       //en el momento en el que lo matan estaba vivo y es la primera vez que se muere
@@ -61,15 +69,27 @@ class Enemy {
         audio.play();
       }
       this.nextAnimationFrame();
-      //moverse en la dirección del jugador y mover la hitbox segun la posición
-      if (player.x + 30 < this.x) {
-        this.speed.x -= this.acceleration;
-        this.animation = 0;
-      }
-      else if (player.x - 30 > this.x) {
-        this.speed.x += this.acceleration;
-        this.animation = 1;
-      }
+      
+      if(this.agressive){
+        if (player.x + 30 < this.x) {
+          this.speed.x -= this.acceleration;
+          this.animation = 0;
+        }
+        else if (player.x - 30 > this.x) {
+          this.speed.x += this.acceleration;
+          this.animation = 1;
+        }
+
+      } else{
+        if (player.x < this.x) {
+          this.speed.x += this.acceleration;
+          this.animation = 1;
+        }
+        else if (player.x > this.x) {
+          this.speed.x -= this.acceleration;
+          this.animation = 0;
+        }
+      }     
 
 
       this.speed.y += gravity;
@@ -84,7 +104,7 @@ class Enemy {
   }
 
   nextAnimationFrame() {
-    if (frame % 8 === 0) {
+    if (frame % this.frameCooldown === 0) {
       if (this.frame < 7) {
         this.frame++;
       } else {
@@ -93,7 +113,7 @@ class Enemy {
     }
   }
   nextFrameDead() {
-    if (frame % 8 === 0) {
+    if (frame % 8  === 0) {
       if (this.frame >= 7) {
         this.frame = 7;
       } else {

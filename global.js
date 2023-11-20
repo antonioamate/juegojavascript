@@ -1,4 +1,4 @@
-let player, enemies, interval, ctx, canvas, backgroundImage, projectiles, keys, paused, fps, gravity, frame, killCount, wave;
+let player, enemies, interval, ctx, canvas, backgroundImage, projectiles, keys, paused, fps, gravity, frame, killCount, wave, escaped;
 const blocks = [
   new Block({
     x: 0,
@@ -21,9 +21,14 @@ const blocks = [
 ];
 
 const playerDeathSounds = ["wasted", "windowsxp", "mariodeath", "astronomia", "funeral", "justdeath", "rickroll", "coolstory", "estudiar"];
-const enemyDeathSounds = ["windowsxp"];
-const jumpSounds = ["mariojump", "uwu", "kasumi-jump"];
+const enemyDeathSounds = ["death-skeleton"];
+const enemyHitSounds = ["hurt1-skeleton", "hurt2-skeleton", "hurt3-skeleton", "hurt4-skeleton"];
+const playerHitSounds = ["minecrafthit", "punch", "minecraft-hurt"];
+const jumpSounds = ["mariojump"];
 const bulletWoodSounds = ["bulletwood"];
+const newWaveSounds = ["anenemy"];
+const newGameSounds = ["herewegoagain"];
+const beggingSounds = ["nogod"];
 
 function randomSound(array) {
   let index = Math.floor(Math.random() * array.length);
@@ -32,6 +37,8 @@ function randomSound(array) {
 }
 
 function newGame() {
+  
+  escaped = 0;
   wave = 0;
   canvas = document.getElementById("canvas");
   ctx = canvas.getContext("2d");
@@ -43,12 +50,14 @@ function newGame() {
   killCount = 0;
   frame = 0;
   enemies = [];
-  newWave();
+  
   projectiles = [];
   paused = false;
   player = new Player();
 }
 function newWave() {
+
+  randomSound(newWaveSounds);
   wave++;
   for (let i = 0; i < wave; i++) {
     enemies.push(new Enemy());
@@ -62,13 +71,20 @@ function checkGameBorders(object) {
     object.speed.y = 0;
     object.onGround = true;
   }
-  if (object.x + object.speed.x < 0) {
-    object.x = 0;
-    object.speed.x = 0;
+  if (object instanceof Player) {
+    if (object.x + object.speed.x < 0) {
+      object.x = 0;
+      object.speed.x = 0;
+    }
+    if (object.x + object.width + object.speed.x >= 1280) {
+      object.x = 1280 - object.width;
+      object.speed.x = 0;
+    }
   }
-  if (object.x + object.width + object.speed.x >= 1280) {
-    object.x = 1280 - object.width;
-    object.speed.x = 0;
+
+  if (object instanceof Enemy && (object.x + object.width < 0 || object.x > 1280)) {
+    escaped++
+    removeEnemy(object);
   }
 }
 
@@ -104,8 +120,9 @@ function checkPlayerEnemyCollisions() {
         if (frame - enemy.lastBite > 30) {
           //morder al jugador
           console.log("player got bite");
+          randomSound(playerHitSounds)
           enemy.lastBite = frame;
-          player.health -= 5;
+          player.health -= 20;
           //dependiendo de la posición del jugador con respecto al enemigo
           //se empuja al jugador a la izquierda o la derecha y siempre un poco hacia arriba
           if (player.x > enemy.x) {

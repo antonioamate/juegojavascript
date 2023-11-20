@@ -41,6 +41,7 @@ class Projectile {
           enemy.health -= this.damage;
           removeProjectile(this);
           console.log("enemy got shot");
+          randomSound(enemyHitSounds)
           return;
         }
       }

@@ -22,6 +22,9 @@ onload = () => {
 
 function animation() {
   if (!paused) {
+    (frame===100) ? randomSound(newGameSounds) :
+    (frame===500) ? newWave() :
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
