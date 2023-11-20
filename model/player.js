@@ -114,10 +114,10 @@ class Player {
       this.getArmPistolDimensions();
     }
   }
-
+  //&& keys.click
   checkInput() {
-    if (this.pistol.canShoot && keys.click) this.shoot();
-    this.facingRight = this.aim.x < this.x + 60 ? false : true;
+    if (this.pistol.canShoot) this.shoot();
+    this.facingRight = this.aim.x < this.x + 22 ? false : true;
     this.facingRight ? this.animationIdleRight() : this.animationIdleLeft();
     if (keys.a) {
       this.speed.x -= this.acceleration;
@@ -186,35 +186,35 @@ class Player {
   
   animationWalkLeft() {
     this.animation = 0;
-    this.updateArmOffset({ x: 19, y: 23 });
+    this.updateArmOffset({ x: 20, y: 28 });
   }
   animationWalkRight() {
     this.animation = 1;
-    this.updateArmOffset({ x: 81, y: 23 });
+    this.updateArmOffset({ x: 20, y: 28 });
   }
   animationIdleRight() {
     this.animation = 2;
-    this.updateArmOffset({ x: 67, y: 28 });
+    this.updateArmOffset({ x: 20, y: 28 });
   }
   animationIdleLeft() {
     this.animation = 3;
-    this.updateArmOffset({ x: 60, y: 28 });
+    this.updateArmOffset({ x: 20, y: 28 });
   }
   animationCoverLeft() {
     this.animation = 4;
-    this.updateArmOffset({ x: 70, y: 64 });
+    this.updateArmOffset({ x: 22, y: 64 });
   }
   animationCoverRight() {
     this.animation = 5;
-    this.updateArmOffset({ x: 49, y: 64 });
+    this.updateArmOffset({ x: 16, y: 64 });
   }
   animationBackLeft() {
     this.animation = 6;
-    this.updateArmOffset({ x: 81, y: 23 });
+    this.updateArmOffset({ x: 20, y: 28 });
   }
   animationBackRight() {
     this.animation = 7;
-    this.updateArmOffset({ x: 19, y: 23 });
+    this.updateArmOffset({ x: 20, y: 28 });
   }
   updateArmOffset(offset = { x, y }) {
     this.arm.offset.x = offset.x;
@@ -225,10 +225,11 @@ class Player {
     //las coordenadas del ratón, y la posición del jugador
     //calcular hombro
     if (this.frame < 5) {
-      this.arm.start.y = this.y + this.arm.offset.y + this.frame - 0.5;
+      this.arm.start.y = this.y + this.arm.offset.y + this.frame ;
     } else {
-      this.arm.start.y = this.y + this.arm.offset.y + 7 - this.frame - 0.5;
+      this.arm.start.y = this.y + this.arm.offset.y + 8 - this.frame;
     }
+
     this.arm.start.x = this.x + this.arm.offset.x;
 
     //calcular posicion pistola

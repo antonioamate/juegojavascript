@@ -6,7 +6,7 @@ class Enemy {
     this.deathTime = 0;
     this.x= Math.random() * 1270;
     this.y= 100;
-    this.width= 100;
+    this.width= 60;
     this.height= 125;
     this.image = new Image();
     this.image.src = "./img/spriteenemy.png";
@@ -21,19 +21,18 @@ class Enemy {
   }
 
   draw() {
-    ctx.fillStyle = "rgba(0, 255, 0,0.5)";
-    ctx.fillRect(this.x+this.hitboxOffset.x, this.hitboxOffset.y+this.y, this.size.width + this.hitboxOffset.width, this.size.height + this.hitboxOffset.height);
+
     ctx.fillStyle = "rgba(255, 0, 0,0.2)";
-    ctx.fillRect(this.x, this.y, 100, 125);
+    ctx.fillRect(this.x, this.y, this.width, this.height);
     ctx.drawImage(
       this.image,
-      this.frame * 100, //por donde empieza a recortar la imagen
+      (this.frame * 100)+20, //por donde empieza a recortar la imagen
       this.animation * 125,
-      100, //lo que recorta de la imagen fuente
+      60, //lo que recorta de la imagen fuente
       125,
       this.x, //donde pone la imagen
       this.y,
-      100, //dimensiones de la imagen a dibujar (dejarlo igual)
+      60, //dimensiones de la imagen a dibujar (dejarlo igual)
       125
     );
   }
@@ -66,7 +65,7 @@ class Enemy {
         this.speed.x -= this.acceleration;
         this.animation = 0;
       }
-      if (player.x - 30 > this.x) {
+      else if (player.x - 30 > this.x) {
         this.speed.x += this.acceleration;
         this.animation = 1;
       }
