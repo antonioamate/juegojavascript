@@ -1,16 +1,4 @@
-let player,
-  enemies,
-  interval,
-  ctx,
-  canvas,
-  backgroundImage,
-  projectiles,
-  keys,
-  paused,
-  fps,
-  gravity,
-  frame,
-  killCount;
+let player, enemies, interval, ctx, canvas, backgroundImage, projectiles, keys, paused, fps, gravity, frame, killCount;
 const blocks = [
   new Block({
     x: 200,
@@ -20,17 +8,7 @@ const blocks = [
   }),
 ];
 
-const playerDeathSounds = [
-  "wasted",
-  "windowsxp",
-  "mariodeath",
-  "astronomia",
-  "funeral",
-  "justdeath",
-  "rickroll",
-  "coolstory",
-  "estudiar",
-];
+const playerDeathSounds = ["wasted", "windowsxp", "mariodeath", "astronomia", "funeral", "justdeath", "rickroll", "coolstory", "estudiar"];
 const enemyDeathSounds = ["windowsxp"];
 const jumpSounds = ["mariojump", "uwu", "kasumi-jump"];
 
@@ -45,17 +23,17 @@ onload = () => {
     player.aim.x = event.clientX - canvas.getBoundingClientRect().left;
     player.aim.y = event.clientY - canvas.getBoundingClientRect().top;
   });
+  addEventListener("keydown", handleKeyDown);
+  addEventListener("keyup", handleKeyUp);
+  addEventListener("mousedown", (e) => {
+    keys.click = true;
+  });
+  addEventListener("mouseup", (e) => {
+    keys.click = false;
+  });
+  window.addEventListener("wheel", handleScroll);
 };
 
-addEventListener("keydown", handleKeyDown);
-addEventListener("keyup", handleKeyUp);
-addEventListener("mousedown", (e) => {
-  keys.click = true;
-});
-addEventListener("mouseup", (e) => {
-  keys.click = false;
-});
-window.addEventListener("wheel", handleScroll);
 function animation() {
   if (!paused) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -111,24 +89,14 @@ function checkGameBorders(object) {
 
 //IS COLLIDING
 function isColliding(o1, o2) {
-  return (
-    o1.x < o2.x + o2.width &&
-    o1.x + o1.width > o2.x &&
-    o1.y < o2.y + o2.height &&
-    o1.y + o1.height > o2.y
-  );
+  return o1.x < o2.x + o2.width && o1.x + o1.width > o2.x && o1.y < o2.y + o2.height && o1.y + o1.height > o2.y;
 }
 
-//PLAYER BLOCK COLLISIONS
+//PLAYER/ENEMY BLOCK COLLISIONS
 function checkBlockCollisions(object) {
   for (const block of blocks) {
     // Colisión desde arriba
-    if (
-      object.y + object.height + object.speed >= block.y &&
-      object.y + object.height < block.y &&
-      object.x + object.width >= block.x &&
-      object.x <= block.x + block.width
-    ) {
+    if (object.y + object.height + object.speed >= block.y && object.y + object.height < block.y && object.x + object.width >= block.x && object.x <= block.x + block.width) {
       object.y = block.y - object.height;
       object.speed.y = 0;
       object.onGround = true;
@@ -140,7 +108,7 @@ function checkBlockCollisions(object) {
 function checkPlayerCollisions() {
   checkGameBorders(player);
   checkBlockCollisions(player);
-  
+  checkPlayerEnemyCollisions()
 }
 //PLAYER ENEMY COLLISION
 function checkPlayerEnemyCollisions() {
@@ -182,13 +150,7 @@ function updateDrawProjectiles() {
     projectile.update();
     projectile.draw();
   }
-  projectiles = projectiles.filter(
-    (projectile) =>
-      projectile.x > 0 &&
-      projectile.x < canvas.width &&
-      projectile.y > 0 &&
-      projectile.y < canvas.height
-  );
+  projectiles = projectiles.filter((projectile) => projectile.x > 0 && projectile.x < canvas.width && projectile.y > 0 && projectile.y < canvas.height);
 }
 
 //UPDATE DRAW ENEMIES

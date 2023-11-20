@@ -1,15 +1,5 @@
 class Projectile {
   constructor({ x, y, target, angle }) {
-    this.hitbox = {
-      position: {
-        x: 0,
-        y: 0,
-      },
-      size: {
-        width: 2,
-        height: 2,
-      },
-    };
     this.damage = 20;
     this.x = x;
     this.y = y;
@@ -30,9 +20,7 @@ class Projectile {
     ctx.rotate(this.angle);
     ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
     ctx.restore();
-    //ctx.fillStyle = "cyan";
-    //dibujar la hitbox de la bala
-    //ctx.fillRect(this.x, this.y, this.width, this.height);
+
   }
 
   update() {

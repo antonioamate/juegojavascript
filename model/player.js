@@ -114,9 +114,9 @@ class Player {
       this.getArmPistolDimensions();
     }
   }
-  //&& keys.click
+  
   checkInput() {
-    if (this.pistol.canShoot) this.shoot();
+    if (this.pistol.canShoot && keys.click) this.shoot();
     this.facingRight = this.aim.x < this.x + 22 ? false : true;
     this.facingRight ? this.animationIdleRight() : this.animationIdleLeft();
     if (keys.a) {
@@ -149,10 +149,8 @@ class Player {
     audio.play();
     let angle = this.pistol.angle;
     const projectile = new Projectile({
-      position: {
         x: this.pistol.x,
         y: this.pistol.y,
-      },
       target: {
         x: this.aim.x,
         y: this.aim.y,
@@ -182,8 +180,6 @@ class Player {
       this.drawPistol();
     }
   }
-
-  
   animationWalkLeft() {
     this.animation = 0;
     this.updateArmOffset({ x: 20, y: 28 });
@@ -272,7 +268,7 @@ class Player {
     }
   }
   nextAnimationFrame() {
-    if (frame % 4 === 0) {
+    if (frame % 5 === 0) {
       if (this.frame < 7) {
         this.frame++;
       } else {
@@ -283,8 +279,7 @@ class Player {
   drawPlayer() {
     ctx.fillStyle = "rgba(255, 0, 0,0.2)";
     ctx.fillRect(this.x, this.y, 40, 125);
-    ctx.fillStyle = "rgba(0, 255, 0,0.5)";
-    ctx.drawImage(this.image, this.frame * 100 + 30, this.animation * 125, 40, 125, this.x, this.y, 40, 125);
+    ctx.drawImage(this.image, (this.frame * 100) + 30, this.animation * 125, 40, 125, this.x, this.y, 40, 125);
   }
   drawArm() {
     //dibujar el brazo
