@@ -17,7 +17,7 @@ class Enemy {
       y: 0,
     };
     this.acceleration = 0.5;
-    this.animation = 2;
+    this.animation = 0;
     this.frame = 0;
     this.onGround = true;
     this.frameCooldown = 8;

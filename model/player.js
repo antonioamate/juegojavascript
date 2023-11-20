@@ -83,6 +83,7 @@ class Player {
     //si está muerto no se puede morir más y se guarda la hora de la defunción
     //el frame se pone a 0
     if (!this.dead && this.health <= 0) {
+      music.pause()
       this.animation = 8;
       this.dead = true;
       this.deathTime = frame;
