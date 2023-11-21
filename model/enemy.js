@@ -1,12 +1,17 @@
 class Enemy {
   constructor() {
+    this.goDown = false;
+    this.goDownTimestamp=0;
+    this.lastJumpFrameStamp=0
     this.beggingAudio;
     this.agressive = true;
     this.lastBite = 0;
     this.health = 100;
     this.dead = false;
     this.deathTime = 0;
-    this.x = Math.random() * 1270;
+    this.limitPain=(Math.random()*80)+15
+    this.x = (Math.random() * 100)+1100;
+    this.birthDay=new Date()
     this.y = 100;
     this.width = 60;
     this.height = 125;
@@ -16,7 +21,7 @@ class Enemy {
       x: 0,
       y: 0,
     };
-    this.acceleration = 0.5;
+    this.acceleration = Math.random()+0.5;
     this.animation = 0;
     this.frame = 0;
     this.onGround = true;
@@ -38,10 +43,10 @@ class Enemy {
       125
     );
   }
-  
+
   update() {
     this.speed.x = 0;
-    if (this.health <= 20 && this.agressive) {
+    if (this.health <= this.limitPain && this.agressive) {
       this.agressive = false;
       this.acceleration = 3;
       this.frameCooldown = 2;
@@ -64,11 +69,10 @@ class Enemy {
       }
     } else {
       if (frame % (Math.floor(Math.random() * 1500) + 120) === 0) {
-        const audio = new Audio("./sounds/zombie.mp3");
-        audio.play();
+        randomSound(angryEnemySounds)
       }
       this.nextAnimationFrame();
-
+      //si está agresivo corre hacia ti
       if (this.agressive) {
         if (player.x + 30 < this.x) {
           this.speed.x -= this.acceleration;
@@ -77,7 +81,17 @@ class Enemy {
           this.speed.x += this.acceleration;
           this.animation = 1;
         }
+        //si está por debajo del jugador salta
+        if (this.y > player.y + 10) {
+          this.jump();
+        }
+        if (this.y < player.y -10) {
+          this.goDown=true
+        }else {
+          this.goDown=false
+        }
       } else {
+        //huir del jugador
         if (player.x < this.x) {
           this.speed.x += this.acceleration;
           this.animation = 1;
@@ -95,7 +109,13 @@ class Enemy {
       this.x += this.speed.x;
     }
   }
-
+  jump() {
+    if (this.onGround && frame - this.lastJumpFrameStamp > (Math.random()* 120)+ 300) {
+      this.speed.y -= (Math.random()*5)+10;
+      this.onGround = false;
+      this.lastJumpFrameStamp=frame
+    }
+  }
   nextAnimationFrame() {
     if (frame % this.frameCooldown === 0) {
       if (this.frame < 7) {

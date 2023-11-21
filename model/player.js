@@ -1,5 +1,7 @@
 class Player {
   constructor() {
+    this.goDown=false;
+    this.goDownTimestamp=0;
     this.health = 100;
     this.dead = false;
     this.deathTime = 0;
@@ -32,7 +34,7 @@ class Player {
       shooting: false,
       lastShotTime: 0,
       shotCoolDown: 2,
-      damage: 5,
+      damage: 10,
     };
     this.pistol.image.src = "./img/pistol.png";
     this.uzi.image.src = "./img/uzi.png";
@@ -43,10 +45,10 @@ class Player {
       y: 0,
     };
     this.x = 50;
-    this.y = 50;
+    this.y = -250;
     this.width = 40;
     this.height = 125;
-    this.acceleration = 4;
+    this.acceleration = 5;
     this.jumpStrength = 12;
     this.animation = 2;
     this.covered = false;
@@ -130,10 +132,14 @@ class Player {
       this.speed.x += this.acceleration;
       this.facingRight ? this.animationWalkRight() : this.animationBackRight();
     }
-    if (keys.s && this.onGround) {
+    if (keys.s) {
       this.speed.x = 0;
       this.facingRight ? this.animationCoverRight() : this.animationCoverLeft();
+      this.goDown=true
+    }else {
+      this.goDown=false
     }
+
     if (keys.w) {
       if (this.animation == 4) {
         this.animation = 3;

@@ -34,7 +34,7 @@ onload = () => {
 
 function animation() {
   if (!paused) {
-    if (frame === 0) randomSound(newGameSounds);
+    if (frame === 1) randomSound(newGameSounds);
     if (frame === 200) music.play()
     if (frame === 333) newWave();
 

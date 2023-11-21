@@ -24,12 +24,13 @@ const playerDeathSounds = ["cr7","fatality", "wasted", "windowsxp", "mariodeath"
 const enemyDeathSounds = ["death-skeleton","windowsxp","estudiar"];
 const enemyHitSounds = ["hurt1-skeleton", "hurt2-skeleton", "hurt3-skeleton", "hurt4-skeleton"];
 const playerHitSounds = ["minecrafthit", "punch", "minecraft-hurt"];
-const jumpSounds = ["mariojump"];
-const bulletWoodSounds = ["bulletwood"];
-const newWaveSounds = ["anenemy","enemy","dropping"];
-const endWaveSounds = [];
-const newGameSounds = ["herewegoagain"];
 const beggingSounds = ["nogod", "nonono","demon"];
+const newWaveSounds = ["anenemy","enemy","dropping"];
+const newGameSounds = ["herewegoagain"];
+const bulletWoodSounds = ["bulletwood"];
+const angryEnemySounds = ["zombie"]
+const endWaveSounds = [];
+const jumpSounds = ["mariojump"];
 
 function randomSound(array) {
   let index = Math.floor(Math.random() * array.length);
@@ -88,7 +89,7 @@ function checkGameBorders(object) {
 
   if (object instanceof Enemy && (object.x + object.width < 0 || object.x > 1280)) {
     escaped++;
-
+    object.beggingAudio.pause()
     removeEnemy(object);
   }
 }
@@ -102,11 +103,13 @@ function isColliding(o1, o2) {
 function checkBlockCollisions(object) {
   for (const block of blocks) {
     // Colisión desde arriba
-    if (object.y + object.height + object.speed.y >= block.y && object.y + object.height <= block.y && object.x + object.width >= block.x && object.x <= block.x + block.width) {
+
+    if  (!object.goDown && object.y + object.height + object.speed.y >= block.y && object.y + object.height <= block.y && object.x + object.width >= block.x && object.x <= block.x + block.width) {
       object.y = block.y - object.height;
       object.speed.y = 0;
       object.onGround = true;
-    }
+          }
+
   }
 }
 
