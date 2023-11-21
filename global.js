@@ -1,4 +1,25 @@
-let player, enemies, interval, ctx, canvas, backgroundImage, projectiles, keys, paused, fps, gravity, frame, killCount, wave, escaped, music, records,headshots;
+let score,
+  playername,
+  newgameTimestamp,
+  playing,
+  player,
+  enemies,
+  interval,
+  ctx,
+  canvas,
+  backgroundImage,
+  projectiles,
+  keys,
+  paused,
+  fps,
+  gravity,
+  frame,
+  killCount,
+  wave,
+  escaped,
+  music,
+  records,
+  headshots;
 const blocks = [
   new Block({
     x: 0,
@@ -20,15 +41,34 @@ const blocks = [
   }),
 ];
 
-const playerDeathSounds = ["cr7","fatality", "wasted", "windowsxp", "mariodeath", "astronomia", "funeral", "justdeath", "rickroll", "coolstory", "estudiar", "titanicflute","tobecontinued"];
-const enemyDeathSounds = ["death-skeleton","windowsxp","estudiar"];
-const enemyHitSounds = ["hurt1-skeleton", "hurt2-skeleton", "hurt3-skeleton", "hurt4-skeleton"];
+const playerDeathSounds = [
+  "cr7",
+  "fatality",
+  "wasted",
+  "windowsxp",
+  "mariodeath",
+  "astronomia",
+  "funeral",
+  "justdeath",
+  "rickroll",
+  "coolstory",
+  "estudiar",
+  "titanicflute",
+  "tobecontinued",
+];
+const enemyDeathSounds = ["death-skeleton", "windowsxp", "estudiar"];
+const enemyHitSounds = [
+  "hurt1-skeleton",
+  "hurt2-skeleton",
+  "hurt3-skeleton",
+  "hurt4-skeleton",
+];
 const playerHitSounds = ["minecrafthit", "punch", "minecraft-hurt"];
-const beggingSounds = ["nogod", "nonono","demon"];
-const newWaveSounds = ["anenemy","enemy","dropping"];
+const beggingSounds = ["nogod", "nonono", "demon"];
+const newWaveSounds = ["anenemy", "enemy", "dropping"];
 const newGameSounds = ["herewegoagain"];
 const bulletWoodSounds = ["bulletwood"];
-const angryEnemySounds = ["zombie"]
+const angryEnemySounds = ["zombie"];
 const endWaveSounds = [];
 const jumpSounds = ["mariojump"];
 
@@ -40,13 +80,20 @@ function randomSound(array) {
 }
 
 function newGame() {
-  headshots=0
+  newgameTimestamp = new Date();
+  paused = false;
+  playing = true;
+  headshots = 0;
   escaped = 0;
   wave = 0;
   killCount = 0;
   enemies = [];
   paused = false;
   player = new Player();
+  canvas.addEventListener("mousemove", (event) => {
+    player.aim.x = event.clientX - canvas.getBoundingClientRect().left;
+    player.aim.y = event.clientY - canvas.getBoundingClientRect().top;
+  });
 }
 function drawData() {
   ctx.fillStyle = "#000";
@@ -56,12 +103,12 @@ function drawData() {
   ctx.font = "30px Arial";
   ctx.fillStyle = "white";
   ctx.fillText(player.health, 230, 700);
-  if(killCount>0)ctx.fillText("KILL COUNT = " + killCount, 300, 700);
+  if (killCount > 0) ctx.fillText("KILL COUNT = " + killCount, 300, 700);
   ctx.fillText(player.health, 230, 700);
-  if(escaped>0) ctx.fillText("ESCAPED = " + escaped, 600, 700);
+  if (escaped > 0) ctx.fillText("ESCAPED = " + escaped, 600, 700);
 
   if (wave > 0) ctx.fillText("WAVE = " + wave, 900, 700);
-if (headshots > 0) ctx.fillText("HEADSHOTS = " + headshots, 900, 640);
+  if (headshots > 0) ctx.fillText("HEADSHOTS = " + headshots, 900, 640);
 }
 function newWave() {
   randomSound(newWaveSounds);
@@ -89,16 +136,24 @@ function checkGameBorders(object) {
     }
   }
 
-  if (object instanceof Enemy && (object.x + object.width < 0 || object.x > 1280)) {
+  if (
+    object instanceof Enemy &&
+    (object.x + object.width < 0 || object.x > 1280)
+  ) {
     escaped++;
-    object.beggingAudio.pause()
+    object.beggingAudio.pause();
     removeEnemy(object);
   }
 }
 
 //IS COLLIDING
 function isColliding(o1, o2) {
-  return o1.x < o2.x + o2.width && o1.x + o1.width > o2.x && o1.y < o2.y + o2.height && o1.y + o1.height > o2.y;
+  return (
+    o1.x < o2.x + o2.width &&
+    o1.x + o1.width > o2.x &&
+    o1.y < o2.y + o2.height &&
+    o1.y + o1.height > o2.y
+  );
 }
 
 //PLAYER/ENEMY BLOCK COLLISIONS
@@ -106,12 +161,17 @@ function checkBlockCollisions(object) {
   for (const block of blocks) {
     // Colisión desde arriba
 
-    if  (!object.goDown && object.y + object.height + object.speed.y >= block.y && object.y + object.height <= block.y && object.x + object.width >= block.x && object.x <= block.x + block.width) {
+    if (
+      !object.goDown &&
+      object.y + object.height + object.speed.y >= block.y &&
+      object.y + object.height <= block.y &&
+      object.x + object.width >= block.x &&
+      object.x <= block.x + block.width
+    ) {
       object.y = block.y - object.height;
       object.speed.y = 0;
       object.onGround = true;
-          }
-
+    }
   }
 }
 
@@ -124,7 +184,11 @@ function checkPlayerCollisions() {
 //PLAYER ENEMY COLLISION
 function checkPlayerEnemyCollisions() {
   for (const enemy of enemies) {
-    if (!enemy.dead && isColliding(player, enemy) && frame - enemy.lastBite > 30) {
+    if (
+      !enemy.dead &&
+      isColliding(player, enemy) &&
+      frame - enemy.lastBite > 30
+    ) {
       //comprobar si el enemigo nos ha hecho daño hace más de medio segundo
       //morder al jugador
       console.log("player got bite");
@@ -159,7 +223,13 @@ function updateDrawProjectiles() {
     projectile.update();
     projectile.draw();
   }
-  projectiles = projectiles.filter((projectile) => projectile.x > 0 && projectile.x < canvas.width && projectile.y > 0 && projectile.y < canvas.height);
+  projectiles = projectiles.filter(
+    (projectile) =>
+      projectile.x > 0 &&
+      projectile.x < canvas.width &&
+      projectile.y > 0 &&
+      projectile.y < canvas.height
+  );
 }
 
 //UPDATE DRAW ENEMIES
@@ -245,30 +315,77 @@ function removeProjectile(projectile) {
     projectiles.splice(index, 1);
   }
 }
-function updateDrawRecords() {
-  ctx.fillStyle = "#000";
-  ctx.fillRect(20, 680, 200, 20);
-  records = JSON.parse(localStorage.getItem("records"));
-  records.push({
-    playerName: playerName,
-  });
+function updateRecords() {
+  createTable()
+  //aqui obtenemos los records del localstorage
+  let recordsStorage = JSON.parse(localStorage.getItem("records")) || [];
+  //se calcula la puntuación
+  score = killCount - escaped + headshots;
+  //se crea un nuevo record
+  const newRecord = {
+    score: score,
+    headshots: headshots,
+    killcount: killCount,
+    escaped: escaped,
+    wave: wave,
+    started: newgameTimestamp.toISOString(),
+    ended: new Date().toISOString(),
+    name: playername,
+  };
+  records.push(...recordsStorage);
+  records.push(newRecord);
 
-  localStorage.setItem("records");
+  let root = document.getElementById("root");
 
-  ctx.fillStyle = "#000";
-  ctx.fillRect(20, 680, 200, 20);
-  ctx.fillStyle = player.health > 33 ? "#33cc33" : "#cc0000";
-  ctx.fillRect(20, 680, player.health * 2, 20);
-  ctx.font = "30px Arial";
-  ctx.fillStyle = "white";
-  ctx.fillText(player.health, 230, 700);
-  ctx.fillText("KILL COUNT = " + killCount, 300, 700);
-  ctx.fillText(player.health, 230, 700);
-  ctx.fillText("ESCAPED = " + escaped, 600, 700);
-  
-  if (wave > 0) ctx.fillText("WAVE = " + wave, 900, 700);
+  root.innerHTML = "";
+
+  if (records) {
+    let scoreA, scoreB;
+    records.sort((a, b) => {
+      scoreA = a.killcount - a.escaped + a.headshots;
+      scoreB = b.killcount - b.escaped + b.headshots;
+      return scoreB - scoreA;
+    });
+
+    records.forEach((record) => {
+      let newRow = document.createElement("tr");
+
+      // Llenar la fila con los datos del registro
+      newRow.innerHTML = `
+        <td>${record.score}</td>
+        <td>${record.headshots}</td>
+        <td>${record.killcount}</td>
+        <td>${record.escaped}</td>
+        <td>${record.wave}</td>
+        <td>${record.started}</td>
+        <td>${record.ended}</td>
+        <td>${record.name}</td>
+      `;
+      root.appendChild(newRow);
+    });
+  }
+
+  // Guardar el array actualizado en el LocalStorage
+  localStorage.setItem("records", JSON.stringify(records));
 }
-function randomNumber(minInc,maxInc){
-  
-  return Math.floor(Math.random() * (maxInc - minInc + 1)) + minInc;
+function createTable() {
+  let table = document.createElement("table");
+  let thead = document.createElement("thead");
+  let tbody = document.createElement("tbody");
+  let headerRow = document.createElement("tr");
+  let headers = ["Score", "Headshots", "Kill Count", "Escaped", "Wave", "Started", "Ended", "Player Name"];
+  headers.forEach((headerText) => {
+    let header = document.createElement("th");
+    header.textContent = headerText;
+    headerRow.appendChild(header);
+  });
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+  table.appendChild(tbody);
+  let root = document.getElementById("root");
+  root.innerHTML = "";
+  root.appendChild(table);
+}
+function randomNumber (min, max) {
+  return Math.random() * (max - min) + min;
 }

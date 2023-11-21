@@ -1,4 +1,6 @@
 onload = () => {
+  paused=true
+  playing=false
   canvas = document.getElementById("canvas");
   ctx = canvas.getContext("2d");
   backgroundImage = new Image();
@@ -11,30 +13,35 @@ onload = () => {
   music = new Audio("./sounds/franksinatra.mp3");
   music.loop = true;
 
-    backgroundImage.src = "./img/forest.jpg";
+  backgroundImage.src = "./img/forest.jpg";
+  
+  
+  addEventListener("keydown", handleKeyDown);
+  addEventListener("keyup", handleKeyUp);
 
-    newGame();
+  addEventListener("mousedown", (e) => {
+    keys.click = true;
+  });
+  addEventListener;
+  addEventListener("mouseup", (e) => {
+    keys.click = false;
+  });
+  playernameInput = document.getElementById("playernameInput");
+  let newgamebutton = document.getElementById("newgame");
 
-    //cambiar este setinterval por requestanimationframe cuando esté todo bien
+  playernameInput.addEventListener("input", function () {
+    newgame.disabled = playernameInput.value.trim() === "";
+  });
 
-    canvas.addEventListener("mousemove", (event) => {
-      player.aim.x = event.clientX - canvas.getBoundingClientRect().left;
-      player.aim.y = event.clientY - canvas.getBoundingClientRect().top;
-    });
-    addEventListener("keydown", handleKeyDown);
-    addEventListener("keyup", handleKeyUp);
+  newgamebutton.addEventListener("click", function () {
+    if (playernameInput.value.trim() !== "" && !playing) {
+      newGame()
+      playername=playernameInput.value.trim()
+    }
+  });
 
-    addEventListener("mousedown", (e) => {
-      keys.click = true;
-    });
-    addEventListener
-    addEventListener("mouseup", (e) => {
-      keys.click = false;
-    });
-
-    setInterval(animation, 1000 / fps);
-  };
-
+  setInterval(animation, 1000 / fps);
+};
 
 function animation() {
   if (!paused) {

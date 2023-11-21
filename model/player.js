@@ -93,11 +93,11 @@ class Player {
       randomSound(playerDeathSounds);
     } else if (this.dead) {
       this.nextFrameDead();
-      if (frame - this.deathTime > 140) {
-        paused = true;
-      }
+
       if (frame - this.deathTime > 600) {
-        //aquí se tiene que acabar el juego
+        paused=true
+        playing=false
+        updateRecords()
       }
     } else {
       if(frame%60===0)this.health++
