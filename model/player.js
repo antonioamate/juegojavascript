@@ -175,6 +175,7 @@ class Player {
       },
       angle: angle,
       damage: this.currentGun.gunPistol ? this.pistol.damage : this.uzi.damage,
+      gunPistol: this.currentGun.gunPistol
     });
     projectiles.push(projectile);
   }

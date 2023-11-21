@@ -1,4 +1,4 @@
-let player, enemies, interval, ctx, canvas, backgroundImage, projectiles, keys, paused, fps, gravity, frame, killCount, wave, escaped, music, records;
+let player, enemies, interval, ctx, canvas, backgroundImage, projectiles, keys, paused, fps, gravity, frame, killCount, wave, escaped, music, records,headshots;
 const blocks = [
   new Block({
     x: 0,
@@ -40,6 +40,7 @@ function randomSound(array) {
 }
 
 function newGame() {
+  headshots=0
   escaped = 0;
   wave = 0;
   killCount = 0;
@@ -60,6 +61,7 @@ function drawData() {
   if(escaped>0) ctx.fillText("ESCAPED = " + escaped, 600, 700);
 
   if (wave > 0) ctx.fillText("WAVE = " + wave, 900, 700);
+if (headshots > 0) ctx.fillText("HEADSHOTS = " + headshots, 900, 640);
 }
 function newWave() {
   randomSound(newWaveSounds);
@@ -265,4 +267,8 @@ function updateDrawRecords() {
   ctx.fillText("ESCAPED = " + escaped, 600, 700);
   
   if (wave > 0) ctx.fillText("WAVE = " + wave, 900, 700);
+}
+function randomNumber(minInc,maxInc){
+  
+  return Math.floor(Math.random() * (maxInc - minInc + 1)) + minInc;
 }

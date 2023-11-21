@@ -1,5 +1,5 @@
 class Projectile {
-  constructor({ x, y, target, angle, damage }) {
+  constructor({ x, y, target, angle, damage, gunPistol }) {
     this.damage = damage;
     this.x = x;
     this.y = y;
@@ -7,10 +7,11 @@ class Projectile {
       x: target.x,
       y: target.y,
     };
-    this.speed = 20;
+    this.speed = 40;
     this.width = 10;
     this.height = 2;
     this.angle = angle;
+    this.gunPistol = gunPistol;
   }
 
   draw() {
@@ -18,7 +19,7 @@ class Projectile {
     ctx.save();
     ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
     ctx.rotate(this.angle);
-    ctx.fillRect(-this.width / 2 , -this.height / 2, this.width, this.height);
+    ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
     ctx.restore();
   }
 
@@ -36,14 +37,40 @@ class Projectile {
       }
     }
     for (const enemy of enemies) {
-      if (!enemy.dead) {
-        if (isColliding(this, enemy)) {
-          enemy.health -= this.damage;
-          removeProjectile(this);
-          console.log("enemy got shot");
-          randomSound(enemyHitSounds)
-          return;
+      if (!enemy.dead && isColliding(this, enemy)) {
+        let actualDamage = 0;
+        if (this.gunPistol) {
+          if (this.y < enemy.y + 20) {
+            //disparo en la cabeza
+            actualDamage = 100;
+            headshots++;
+            console.log("headshot!");
+          } else if (this.y < enemy.y + 75) {
+            //disparo en el torso
+            actualDamage = 80;
+          }else {
+            //disparo en las piernas
+            actualDamage=5
+          }
+        } else {
+          if (this.y < enemy.y + 20) {
+            //disparo en la cabeza
+            actualDamage = 100;
+            headshots++;
+            console.log("headshot!");
+          } else if (this.y < enemy.y + 75) {
+            //disparo en el torso
+            actualDamage = 10;
+          }else{
+            //disparo en las piernas
+            actualDamage=5
+          }
         }
+        enemy.health -= actualDamage;
+        removeProjectile(this);
+        console.log("enemy got shot");
+        randomSound(enemyHitSounds);
+        return;
       }
     }
   }

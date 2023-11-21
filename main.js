@@ -2,40 +2,44 @@ onload = () => {
   canvas = document.getElementById("canvas");
   ctx = canvas.getContext("2d");
   backgroundImage = new Image();
-  backgroundImage.src = "./img/forest.jpg";
   canvas.style.cursor = "url('./img/aim_red.cur'), auto";
   keys = new Keys();
+  projectiles = [];
   fps = 60;
+  frame = 0;
   gravity = 0.3;
   music = new Audio("./sounds/franksinatra.mp3");
-  music.loop=true
-  
-  projectiles = [];
-  frame = 0;
+  music.loop = true;
 
-  newGame();
+    backgroundImage.src = "./img/forest.jpg";
 
-  setInterval(animation, 1000 / fps);
-  //cambiar este setinterval por requestanimationframe cuando esté todo bien
+    newGame();
 
-  canvas.addEventListener("mousemove", function (event) {
-    player.aim.x = event.clientX - canvas.getBoundingClientRect().left;
-    player.aim.y = event.clientY - canvas.getBoundingClientRect().top;
-  });
-  addEventListener("keydown", handleKeyDown);
-  addEventListener("keyup", handleKeyUp);
-  addEventListener("mousedown", (e) => {
-    keys.click = true;
-  });
-  addEventListener("mouseup", (e) => {
-    keys.click = false;
-  });
-};
+    //cambiar este setinterval por requestanimationframe cuando esté todo bien
+
+    canvas.addEventListener("mousemove", (event) => {
+      player.aim.x = event.clientX - canvas.getBoundingClientRect().left;
+      player.aim.y = event.clientY - canvas.getBoundingClientRect().top;
+    });
+    addEventListener("keydown", handleKeyDown);
+    addEventListener("keyup", handleKeyUp);
+
+    addEventListener("mousedown", (e) => {
+      keys.click = true;
+    });
+    addEventListener
+    addEventListener("mouseup", (e) => {
+      keys.click = false;
+    });
+
+    setInterval(animation, 1000 / fps);
+  };
+
 
 function animation() {
   if (!paused) {
     if (frame === 1) randomSound(newGameSounds);
-    if (frame === 200) music.play()
+    if (frame === 200) music.play();
     if (frame === 333) newWave();
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);

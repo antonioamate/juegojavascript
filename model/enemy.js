@@ -9,7 +9,7 @@ class Enemy {
     this.health = 100;
     this.dead = false;
     this.deathTime = 0;
-    this.limitPain=(Math.random()*80)+15
+    this.limitPain=randomNumber(10,90)
     this.x = (Math.random() * 100)+1100;
     this.birthDay=new Date()
     this.y = 100;
@@ -110,8 +110,8 @@ class Enemy {
     }
   }
   jump() {
-    if (this.onGround && frame - this.lastJumpFrameStamp > (Math.random()* 120)+ 300) {
-      this.speed.y -= (Math.random()*5)+10;
+    if (this.onGround && frame - this.lastJumpFrameStamp > randomNumber(300,600)) {
+      this.speed.y -= randomNumber(15,20);
       this.onGround = false;
       this.lastJumpFrameStamp=frame
     }
