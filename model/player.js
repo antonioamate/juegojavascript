@@ -95,9 +95,10 @@ class Player {
       this.nextFrameDead();
 
       if (frame - this.deathTime > 600) {
+        updateRecords()
         paused=true
         playing=false
-        updateRecords()
+
       }
     } else {
       if(frame%60===0)this.health++

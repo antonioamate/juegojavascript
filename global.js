@@ -1,4 +1,5 @@
-let score,
+let root,
+  score,
   playername,
   newgameTimestamp,
   playing,
@@ -110,13 +111,6 @@ function drawData() {
   if (wave > 0) ctx.fillText("WAVE = " + wave, 900, 700);
   if (headshots > 0) ctx.fillText("HEADSHOTS = " + headshots, 900, 640);
 }
-function newWave() {
-  randomSound(newWaveSounds);
-  wave++;
-  for (let i = 0; i < wave; i++) {
-    enemies.push(new Enemy());
-  }
-}
 
 //BARRERAS INVISIBLES
 function checkGameBorders(object) {
@@ -146,41 +140,7 @@ function checkGameBorders(object) {
   }
 }
 
-//IS COLLIDING
-function isColliding(o1, o2) {
-  return (
-    o1.x < o2.x + o2.width &&
-    o1.x + o1.width > o2.x &&
-    o1.y < o2.y + o2.height &&
-    o1.y + o1.height > o2.y
-  );
-}
 
-//PLAYER/ENEMY BLOCK COLLISIONS
-function checkBlockCollisions(object) {
-  for (const block of blocks) {
-    // Colisión desde arriba
-
-    if (
-      !object.goDown &&
-      object.y + object.height + object.speed.y >= block.y &&
-      object.y + object.height <= block.y &&
-      object.x + object.width >= block.x &&
-      object.x <= block.x + block.width
-    ) {
-      object.y = block.y - object.height;
-      object.speed.y = 0;
-      object.onGround = true;
-    }
-  }
-}
-
-//PLAYER COLLISIONS
-function checkPlayerCollisions() {
-  checkGameBorders(player);
-  checkBlockCollisions(player);
-  checkPlayerEnemyCollisions();
-}
 //PLAYER ENEMY COLLISION
 function checkPlayerEnemyCollisions() {
   for (const enemy of enemies) {
@@ -207,14 +167,6 @@ function checkPlayerEnemyCollisions() {
       }
     }
   }
-}
-//ENEMY COLLISIONS
-//llamar a esta funcion desde el update de enemy
-function checkEnemyCollisions(enemy) {
-  if (!enemy.dead) {
-    checkBlockCollisions(enemy);
-  }
-  checkGameBorders(enemy);
 }
 
 //UPDATE DRAW PROJECTILES
@@ -315,10 +267,96 @@ function removeProjectile(projectile) {
     projectiles.splice(index, 1);
   }
 }
+
+function newWave() {
+  randomSound(newWaveSounds);
+  wave++;
+  for (let i = 0; i < wave; i++) {
+    enemies.push(new Enemy());
+  }
+}
+
+//BARRERAS INVISIBLES
+
+//IS COLLIDING
+function isColliding(o1, o2) {
+  return (
+    o1.x < o2.x + o2.width &&
+    o1.x + o1.width > o2.x &&
+    o1.y < o2.y + o2.height &&
+    o1.y + o1.height > o2.y
+  );
+}
+
+//PLAYER/ENEMY BLOCK COLLISIONS
+function checkBlockCollisions(object) {
+  for (const block of blocks) {
+    // Colisión desde arriba
+
+    if (
+      !object.goDown &&
+      object.y + object.height + object.speed.y >= block.y &&
+      object.y + object.height <= block.y &&
+      object.x + object.width >= block.x &&
+      object.x <= block.x + block.width
+    ) {
+      object.y = block.y - object.height;
+      object.speed.y = 0;
+      object.onGround = true;
+    }
+  }
+}
+
+//PLAYER COLLISIONS
+function checkPlayerCollisions() {
+  checkGameBorders(player);
+  checkBlockCollisions(player);
+  checkPlayerEnemyCollisions();
+}
+
+//ENEMY COLLISIONS
+//llamar a esta funcion desde el update de enemy
+function checkEnemyCollisions(enemy) {
+  if (!enemy.dead) {
+    checkBlockCollisions(enemy);
+  }
+  checkGameBorders(enemy);
+}
+
+
+
+function createTable() {
+  let table = document.createElement("table");
+  let thead = document.createElement("thead");
+  let tbody = document.createElement("tbody");
+  let headerRow = document.createElement("tr");
+  let headers = [
+    "Score",
+    "Headshots",
+    "Kill Count",
+    "Escaped",
+    "Wave",
+    "Started",
+    "Ended",
+    "Player Name",
+  ];
+  headers.forEach((headerText) => {
+    let header = document.createElement("th");
+    header.textContent = headerText;
+    headerRow.appendChild(header);
+  });
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+  table.appendChild(tbody);
+  root = document.getElementById("root");
+  root.innerHTML = "";
+  root.appendChild(table);
+}
 function updateRecords() {
-  createTable()
+  createTable();
   //aqui obtenemos los records del localstorage
   let recordsStorage = JSON.parse(localStorage.getItem("records")) || [];
+  if (recordsStorage) records.push(...recordsStorage);
   //se calcula la puntuación
   score = killCount - escaped + headshots;
   //se crea un nuevo record
@@ -332,10 +370,7 @@ function updateRecords() {
     ended: new Date().toISOString(),
     name: playername,
   };
-  records.push(...recordsStorage);
   records.push(newRecord);
-
-  let root = document.getElementById("root");
 
   root.innerHTML = "";
 
@@ -352,40 +387,27 @@ function updateRecords() {
 
       // Llenar la fila con los datos del registro
       newRow.innerHTML = `
-        <td>${record.score}</td>
-        <td>${record.headshots}</td>
-        <td>${record.killcount}</td>
-        <td>${record.escaped}</td>
-        <td>${record.wave}</td>
-        <td>${record.started}</td>
-        <td>${record.ended}</td>
-        <td>${record.name}</td>
-      `;
+          <td>${record.score}</td> ￼ ￼New game
+          <td>${record.headshots}</td>
+          <td>${record.killcount}</td>
+          <td>${record.escaped}</td>
+          <td>${record.wave}</td>
+          <td>${record.started}</td>
+          <td>${record.ended}</td>
+          <td>${record.name}</td>
+        `;
       root.appendChild(newRow);
     });
   }
 
   // Guardar el array actualizado en el LocalStorage
   localStorage.setItem("records", JSON.stringify(records));
-}
-function createTable() {
-  let table = document.createElement("table");
-  let thead = document.createElement("thead");
-  let tbody = document.createElement("tbody");
-  let headerRow = document.createElement("tr");
-  let headers = ["Score", "Headshots", "Kill Count", "Escaped", "Wave", "Started", "Ended", "Player Name"];
-  headers.forEach((headerText) => {
-    let header = document.createElement("th");
-    header.textContent = headerText;
-    headerRow.appendChild(header);
-  });
-  thead.appendChild(headerRow);
-  table.appendChild(thead);
   table.appendChild(tbody);
-  let root = document.getElementById("root");
+  root = document.getElementById("root");
+  root = document.getElementById("root");
   root.innerHTML = "";
   root.appendChild(table);
 }
-function randomNumber (min, max) {
+function randomNumber(min, max) {
   return Math.random() * (max - min) + min;
 }
