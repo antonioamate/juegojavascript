@@ -7,6 +7,7 @@ onload = () => {
   canvas.style.cursor = "url('./img/aim_red.cur'), auto";
   keys = new Keys();
   projectiles = [];
+  records=[]
   fps = 60;
   frame = 0;
   gravity = 0.3;

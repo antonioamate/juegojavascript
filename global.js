@@ -54,7 +54,6 @@ const angryEnemySounds = ["zombie"];
 const endWaveSounds = [];
 const jumpSounds = ["mariojump"];
 
-
 function randomSound(array) {
 	let index = Math.floor(Math.random() * array.length);
 	const audio = new Audio("./sounds/" + array[index] + ".mp3");
@@ -79,7 +78,6 @@ function newGame() {
 	});
 }
 function drawData() {
-
 	ctx.fillStyle = "#000";
 	ctx.fillRect(20, 680, 200, 20);
 
@@ -94,14 +92,13 @@ function drawData() {
 	ctx.fillText(player.health, 230, 700);
 	if (escaped > 0) ctx.fillText("ESCAPED = " + escaped, 600, 700);
 	//datos munición uzi
-  ctx.fillText("UZI " + player.uzi.currentMagazine + "/" + player.uzi.magazineCapacity + " " + player.uzi.magazines, 20, 640);
-  //barra de recarga uzi
-  if (player.uzi.reloading) ctx.fillRect(20, 645, (frame - player.uzi.reloadFrameStamp) * 1.5, 5 );
+	ctx.fillText("UZI " + player.uzi.currentMagazine + "/" + player.uzi.magazineCapacity + " " + player.uzi.magazines, 20, 640);
+	//barra de recarga uzi
+	if (player.uzi.reloading) ctx.fillRect(20, 645, (frame - player.uzi.reloadFrameStamp) * 1.5, 5);
 	//datos munición pistola
 	ctx.fillText("PISTOL " + player.pistol.currentMagazine + "/" + player.pistol.magazineCapacity + " " + player.pistol.magazines, 300, 640);
-  //bara de recarga pistola  
-  if (player.pistol.reloading) ctx.fillRect(300, 645, (frame - player.pistol.reloadFrameStamp) * 1.5, 5);
-
+	//bara de recarga pistola
+	if (player.pistol.reloading) ctx.fillRect(300, 645, (frame - player.pistol.reloadFrameStamp) * 1.5, 5);
 
 	if (wave > 0) ctx.fillText("WAVE = " + wave, 900, 700);
 	if (headshots > 0) ctx.fillText("HEADSHOTS = " + headshots, 900, 640);
@@ -206,7 +203,7 @@ function handleKeyDown(e) {
 			player.currentGun.gunPistol = !player.currentGun.gunPistol;
 			break;
 		case "r":
-			player.currentGun.gunPistol ? player.reloadPistol() : player.reloadUzi()
+			player.currentGun.gunPistol ? player.reloadPistol() : player.reloadUzi();
 			break;
 		case "m":
 			music.volume = music.volume > 0 ? (music.volume = 0) : (music.volume = 1);
@@ -318,7 +315,7 @@ function updateRecords() {
 	createTable();
 	//aqui obtenemos los records del localstorage
 	let recordsStorage = JSON.parse(localStorage.getItem("records")) || [];
-	if (recordsStorage) records.push(...recordsStorage);
+	if (recordsStorage && recordsStorage.length > 0) records.push(...recordsStorage);
 	//se calcula la puntuación
 	score = killCount - escaped + headshots;
 	//se crea un nuevo record
@@ -349,7 +346,7 @@ function updateRecords() {
 
 			// Llenar la fila con los datos del registro
 			newRow.innerHTML = `
-          <td>${record.score}</td> ￼ ￼New game
+          <td>${record.score}</td>
           <td>${record.headshots}</td>
           <td>${record.killcount}</td>
           <td>${record.escaped}</td>
