@@ -6,6 +6,7 @@ class Player {
     this.dead = false;
     this.deathTime = 0;
     this.currentGun = {
+      recoilAngle:0,
       gunPistol: false,
       angle: 0,
       x: 300,
@@ -79,6 +80,8 @@ class Player {
   }
 
   update() {
+    
+    console.log(this.currentGun.recoilAngle)
     if(this.health<0)this.health=0
     this.speed.x = 0;
     //en el momento en el que lo matan estaba vivo y es la primera vez que se muere
@@ -151,35 +154,7 @@ class Player {
     }
   }
 
-  shoot(gun) {
-    if (gun === "0") {
-      this.pistol.canShoot = false;
-      this.pistol.shooting = true;
-      this.pistol.lastShotTime = frame;
-      const audio = new Audio("./sounds/pistolShotCut.mp3");
-      audio.play();
-    } else {
-      this.uzi.canShoot = false;
-      this.uzi.shooting = true;
-      this.uzi.lastShotTime = frame;
-      const audio = new Audio("./sounds/uzi.mp3");
-      audio.play();
-    }
-    let angle = this.currentGun.angle;
-
-    const projectile = new Projectile({
-      x: this.currentGun.x,
-      y: this.currentGun.y,
-      target: {
-        x: this.aim.x,
-        y: this.aim.y,
-      },
-      angle: angle,
-      damage: this.currentGun.gunPistol ? this.pistol.damage : this.uzi.damage,
-      gunPistol: this.currentGun.gunPistol
-    });
-    projectiles.push(projectile);
-  }
+ 
   nextFrameGun() {
     if (this.pistol.shooting) {
       if (this.pistol.frame > 9) {
@@ -251,41 +226,91 @@ class Player {
     this.arm.offset.x = offset.x;
     this.arm.offset.y = offset.y;
   }
-  getArmPistolDimensions() {
-    //calcula la posición del hombro y la posición de la culata a partir del offset, el frame,
-    //las coordenadas del ratón, y la posición del jugador
-    //calcular hombro
-    if (this.frame < 5) {
-      this.arm.start.y = this.y + this.arm.offset.y + this.frame;
+  shoot(gun) {
+    if (gun === "0") {
+
+      this.pistol.canShoot = false;
+      this.pistol.shooting = true;
+      this.pistol.lastShotTime = frame;
+      const audio = new Audio("./sounds/pistolShotCut.mp3");
+      audio.play();
     } else {
-      this.arm.start.y = this.y + this.arm.offset.y + 8 - this.frame;
+      this.uzi.canShoot = false;
+      this.uzi.shooting = true;
+      this.uzi.lastShotTime = frame;
+      const audio = new Audio("./sounds/uzi.mp3");
+      audio.play();
+    }
+    
+    const projectile = new Projectile({
+      x: this.currentGun.x,
+      y: this.currentGun.y,
+      target: {
+        x: this.aim.x,
+        y: this.aim.y,
+      },
+      angle: this.currentGun.angle,
+      damage: this.currentGun.gunPistol ? this.pistol.damage : this.uzi.damage,
+      gunPistol: this.currentGun.gunPistol
+    });
+    this.currentGun.recoilAngle-=0.1
+    projectiles.push(projectile);
+
+  }
+  getArmPistolDimensions() {
+    // Calcula la posición del hombro y la posición de la culata a partir del offset, el frame,
+    // las coordenadas del ratón y la posición del jugador
+    if (this.currentGun.recoilAngle < 0) {
+        this.currentGun.recoilAngle += 0.01;
+    } else {
+        this.currentGun.recoilAngle = 0;
     }
 
+    // Calcular posición del hombro
+    if (this.frame < 5) {
+        this.arm.start.y = this.y + this.arm.offset.y + this.frame;
+    } else {
+        this.arm.start.y = this.y + this.arm.offset.y + 8 - this.frame;
+    }
     this.arm.start.x = this.x + this.arm.offset.x;
 
-    //calcular posicion pistola
-    let armRotation;
+    // Calcular posición de la pistola
+    // Calcular vector entre la mira y el hombro
     let dx = this.aim.x - this.arm.start.x;
     let dy = this.aim.y - this.arm.start.y;
-    this.currentGun.aimDistance = Math.sqrt(dx * dx + dy * dy);
 
+    // Calcular distancia entre el hombro y la mira
+    this.currentGun.aimDistance = Math.sqrt(dx * dx + dy * dy);
     let normalizedDx = dx / this.currentGun.aimDistance;
     let normalizedDy = dy / this.currentGun.aimDistance;
 
-    this.currentGun.x = this.arm.start.x + normalizedDx * this.currentGun.shoulderDistance;
-    this.currentGun.y = this.arm.start.y + normalizedDy * this.currentGun.shoulderDistance;
-    this.currentGun.angle = Math.atan2(dy, dx);
+    // Rotar el vector de la pistola
+    let rotatedDX = normalizedDx * Math.cos(this.currentGun.recoilAngle) - normalizedDy * Math.sin(this.currentGun.recoilAngle);
+    let rotatedDY = normalizedDx * Math.sin(this.currentGun.recoilAngle) + normalizedDy * Math.cos(this.currentGun.recoilAngle);
 
-    //ajustar el brazo segun donde mire el jugador
+    // Posición de la pistola con el vector rotado
+    this.currentGun.x = this.arm.start.x + rotatedDX * this.currentGun.shoulderDistance;
+    this.currentGun.y = this.arm.start.y + rotatedDY * this.currentGun.shoulderDistance;
 
-    armRotation = this.facingRight ? 0.16 : -0.16;
+    // Ángulo de la pistola con el vector rotado
+    this.currentGun.angle = Math.atan2(rotatedDY, rotatedDX);
+    this.currentGun.angle += this.currentGun.recoilAngle;
 
-    let armDX = normalizedDx * Math.cos(armRotation) - normalizedDy * Math.sin(armRotation);
-    let armDY = normalizedDx * Math.sin(armRotation) + normalizedDy * Math.cos(armRotation);
+    // Ajustar el brazo según donde mire el jugador
+    let armRotation = this.facingRight ? 0.16 : -0.16;
 
-    this.arm.end.x = this.arm.start.x + armDX * this.arm.length;
-    this.arm.end.y = this.arm.start.y + armDY * this.arm.length;
-  }
+    // Rotar el vector del brazo
+    let rotatedArmDX = normalizedDx * Math.cos(this.currentGun.recoilAngle) - normalizedDy * Math.sin(this.currentGun.recoilAngle);
+    let rotatedArmDY = normalizedDx * Math.sin(this.currentGun.recoilAngle) + normalizedDy * Math.cos(this.currentGun.recoilAngle);
+
+    // Aplicar la misma rotación al vector del brazo
+    let finalArmDX = rotatedArmDX * Math.cos(armRotation) - rotatedArmDY * Math.sin(armRotation);
+    let finalArmDY = rotatedArmDX * Math.sin(armRotation) + rotatedArmDY * Math.cos(armRotation);
+
+    // Calcular la posición final del brazo
+    this.arm.end.x = this.arm.start.x + finalArmDX * this.arm.length;
+    this.arm.end.y = this.arm.start.y + finalArmDY * this.arm.length;
+}
   jump() {
     if (this.onGround) {
       this.speed.y -= this.jumpStrength;
