@@ -16,6 +16,11 @@ class Player {
 			facingRight: true,
 		};
 		this.pistol = {
+			magazines: 5,
+			magazineCapacity: 12,
+			currentMagazine: 12,
+			reloadFrameStamp: 0,
+			reloading: false,
 			recoil: 0.4,
 			canShoot: true,
 			image: new Image(),
@@ -28,6 +33,11 @@ class Player {
 			damage: 80,
 		};
 		this.uzi = {
+			magazines: 5,
+			magazineCapacity: 50,
+			currentMagazine: 50,
+			reloadFrameStamp: 0,
+			reloading: false,
 			recoil: 0.05,
 			canShoot: true,
 			image: new Image(),
@@ -82,9 +92,29 @@ class Player {
 	}
 
 	update() {
-		console.log(this.currentGun.recoilAngle);
 		if (this.health < 0) this.health = 0;
 		this.speed.x = 0;
+
+
+		if (this.pistol.reloading) {
+			if (!this.currentGun.gunPistol) {
+				this.pistol.reloading = false;
+			} else if (frame - this.pistol.reloadFrameStamp > 120) {
+				this.pistol.currentMagazine = this.pistol.magazineCapacity;
+				this.pistol.magazines--;
+				this.pistol.reloading = false;
+			}
+		}
+		if (this.uzi.reloading) {
+			if (this.currentGun.gunPistol) {
+				this.uzi.reloading = false;
+			} else if (frame - this.uzi.reloadFrameStamp > 120) {
+				this.uzi.currentMagazine = this.uzi.magazineCapacity;
+				this.uzi.magazines--;
+				this.uzi.reloading = false;
+			}
+		}
+
 		//en el momento en el que lo matan estaba vivo y es la primera vez que se muere
 		//si está muerto no se puede morir más y se guarda la hora de la defunción
 		//el frame se pone a 0
@@ -124,8 +154,17 @@ class Player {
 	}
 
 	checkInput() {
-		if (this.pistol.canShoot && keys.click && this.currentGun.gunPistol) this.shoot("0");
-		if (this.uzi.canShoot && keys.click && !this.currentGun.gunPistol) this.shoot("1");
+    
+		if (this.pistol.currentMagazine > 0 && this.pistol.canShoot && keys.click && this.currentGun.gunPistol) {
+			this.shoot("0");
+		}else if(this.pistol.currentMagazine===0){
+      this.reloadPistol()
+    }
+		if (this.uzi.currentMagazine > 0 && this.uzi.canShoot && keys.click && !this.currentGun.gunPistol) {
+			this.shoot("1");
+		}else if (this.uzi.currentMagazine===0){
+      this.reloadUzi()
+    }
 		this.facingRight = this.aim.x < this.x + 22 ? false : true;
 		this.facingRight ? this.animationIdleRight() : this.animationIdleLeft();
 		if (keys.a) {
@@ -227,14 +266,18 @@ class Player {
 	}
 	shoot(gun) {
 		if (gun === "0") {
+			this.pistol.currentMagazine--;
 			this.pistol.canShoot = false;
 			this.pistol.shooting = true;
+      this.pistol.reloading=false
 			this.pistol.lastShotTime = frame;
 			const audio = new Audio("./sounds/pistolShotCut.mp3");
 			audio.play();
 		} else {
+      this.uzi.currentMagazine--;
 			this.uzi.canShoot = false;
 			this.uzi.shooting = true;
+      this.uzi.reloading=false
 			this.uzi.lastShotTime = frame;
 			const audio = new Audio("./sounds/uzi.mp3");
 			audio.play();
@@ -252,9 +295,24 @@ class Player {
 			gunPistol: this.currentGun.gunPistol,
 		});
 		let recoil = this.currentGun.gunPistol ? this.pistol.recoil : this.uzi.recoil;
-		this.currentGun.recoilAngle += recoil 
+		this.currentGun.recoilAngle += recoil;
 
 		projectiles.push(projectile);
+	}
+	reloadPistol() {
+    //si tengo cargadores y el cargador actual no está lleno y no está recargando
+		if (this.pistol.magazines > 0 && this.pistol.currentMagazine < this.pistol.magazineCapacity && !this.pistol.reloading) {
+			//se guarda el frame donde se ha empezado a recargar y se pone reloading a true
+      this.pistol.reloadFrameStamp = frame;
+			this.pistol.reloading = true;
+		}
+	}
+
+	reloadUzi() {
+		if (this.uzi.magazines > 0 && this.uzi.currentMagazine < this.uzi.magazineCapacity && !this.uzi.reloading) {
+			this.uzi.reloadFrameStamp = frame;
+			this.uzi.reloading = true;
+		}
 	}
 	getArmPistolDimensions() {
 		// Calcula la posición del hombro y la posición de la culata a partir del offset, el frame,
