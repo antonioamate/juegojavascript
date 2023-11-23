@@ -47,16 +47,18 @@ onload = () => {
 function animation() {
   if (!paused) {
     if (frame === 1) randomSound(newGameSounds);
+    if(frame===400) ammoBoxes.push(new Ammo())
     if (frame === 200) music.play();
     if (frame === 333) newWave();
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
-
+    
     updateDrawProjectiles();
     updateDrawBlocks();
     updateDrawEnemies();
     updateDrawPlayer();
+    updateDrawAmmo()
     drawData();
     frame++;
   }

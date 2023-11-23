@@ -7,7 +7,7 @@ class Projectile {
       x: target.x,
       y: target.y,
     };
-    this.speed = 40;
+    this.speed = 30;
     this.width = 10;
     this.height = 2;
     this.angle = angle;
