@@ -1,34 +1,35 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Juego</title>
-    <link rel="stylesheet" type="text/css" href="style.css" title="style" />
-    <link rel="icon" type="image/x-icon" href="/img/favicon.ico" />
-  </head>
-  <body>
-    <canvas id="canvas" width="1280" height="720"></canvas>
-    <input type="text" id="playernameInput" placeholder="Write your name " />
-    <button id="newgame" disabled>New game</button>
+	<head>
+		<meta charset="utf-8" />
+		<title>Juego</title>
+		<link rel="stylesheet" type="text/css" href="style.css" title="style" />
+		<link rel="icon" type="image/x-icon" href="/img/favicon.ico" />
+	</head>
+	<body>
+		<canvas id="canvas" width="1280" height="720"></canvas>
+		<br>
+    <div><input type="text" id="playernameinput" placeholder="Write your name" /> <button id="newgame" disabled>New game</button></div>
+		<br>
     <table id="table">
-      <tr>
-        <th>Score</th>
-        <th>Headshots</th>
-        <th>Kill Count</th>
-        <th>Escaped</th>
-        <th>Wave</th>
-        <th>Started</th>
-        <th>Ended</th>
-        <th>Player Name</th>
-      </tr>
-    </table>
-    <script src="./model/block.js"></script>
-    <script src="./model/enemy.js"></script>
-    <script src="./model/keys.js"></script>
-    <script src="./model/player.js"></script>
-    <script src="./model/projectile.js"></script>
-    <script src="./model/ammo.js"></script>
-    <script src="global.js"></script>
-    <script src="main.js"></script>
-  </body>
+			<tr>
+				<th>Score</th>
+				<th>Headshots</th>
+				<th>Kill Count</th>
+				<th>Escaped</th>
+				<th>Wave</th>
+				<th>Started</th>
+				<th>Ended</th>
+				<th>Player Name</th>
+			</tr>
+		</table>
+		<script src="./model/block.js"></script>
+		<script src="./model/enemy.js"></script>
+		<script src="./model/keys.js"></script>
+		<script src="./model/player.js"></script>
+		<script src="./model/projectile.js"></script>
+		<script src="./model/ammo.js"></script>
+		<script src="global.js"></script>
+		<script src="main.js"></script>
+	</body>
 </html>
