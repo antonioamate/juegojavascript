@@ -166,7 +166,7 @@ function checkPlayerEnemyCollisions() {
 			console.log("player got bite");
 			randomSound(playerHitSounds);
 			enemy.lastBite = frame;
-			player.health -= 20;
+			player.health -= enemy.damage;
 			//dependiendo de la posición del jugador con respecto al enemigo
 			//se empuja al jugador a la izquierda o la derecha y siempre un poco hacia arriba
 			if (player.x > enemy.x) {

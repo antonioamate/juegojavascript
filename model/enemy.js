@@ -1,30 +1,32 @@
 class Enemy {
 	constructor() {
+		this.scale=randomNumber(0.5,3)
 		this.goDown = false;
 		this.goDownTimestamp = 0;
 		this.lastJumpFrameStamp = 0;
 		this.beggingAudio;
 		this.agressive = true;
 		this.lastBite = 0;
-		this.health = 100;
+		this.health = 100 * this.scale;
 		this.dead = false;
 		this.deathTime = 0;
-		this.limitPain = randomNumber(10, 90);
+		this.limitPain = randomNumber(10, 90) * this.scale;
 		this.x = randomNumber(200, 1000);
 		this.y = 100;
-		this.width = 60;
-		this.height = 125;
+		this.width = 60 * this.scale;
+		this.height = 125 * this.scale;
+		this.damage=20*this.scale
 		this.image = new Image();
 		this.image.src = "./img/spriteenemy.png";
 		this.speed = {
 			x: 0,
 			y: 0,
 		};
-		this.acceleration = randomNumber(0.5, 2);
+		this.acceleration = 1/this.scale
 		this.animation = 0;
 		this.frame = 0;
 		this.onGround = true;
-		this.frameCooldown = 8;
+		this.frameCooldown = 8 * this.scale;
 	}
 
 	draw() {
@@ -36,8 +38,8 @@ class Enemy {
 			125,
 			this.x, //donde pone la imagen
 			this.y,
-			60, //dimensiones de la imagen a dibujar (dejarlo igual)
-			125
+			this.width, //dimensiones de la imagen a dibujar (dejarlo igual)
+			this.height
 		);
 	}
 
@@ -106,7 +108,7 @@ class Enemy {
 				}
 			}
 			//aplicar gravedad y comprobar colisoines
-			this.speed.y += gravity;
+			this.speed.y += gravity/this.scale;
 			checkEnemyCollisions(this);
 
 			//actualizar posición

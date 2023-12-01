@@ -101,7 +101,7 @@ class Player {
 		if (this.pistol.reloading) {
 			if (!this.currentGun.gunPistol) {
 				this.pistol.reloading = false;
-			} else if (frame - this.pistol.reloadFrameStamp > 120) {
+			} else if (frame - this.pistol.reloadFrameStamp > 60) {
 				this.pistol.currentMagazine = this.pistol.magazineCapacity;
 				this.pistol.magazines--;
 				this.pistol.reloading = false;
@@ -110,7 +110,7 @@ class Player {
 		if (this.uzi.reloading) {
 			if (this.currentGun.gunPistol) {
 				this.uzi.reloading = false;
-			} else if (frame - this.uzi.reloadFrameStamp > 120) {
+			} else if (frame - this.uzi.reloadFrameStamp > 60) {
 				this.uzi.currentMagazine = this.uzi.magazineCapacity;
 				this.uzi.magazines--;
 				this.uzi.reloading = false;
