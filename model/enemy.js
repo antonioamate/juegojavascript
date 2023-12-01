@@ -108,19 +108,19 @@ class Enemy {
 				}
 			}
 			//aplicar gravedad y comprobar colisoines
-			this.speed.y += gravity/this.scale;
+			this.speed.y += gravity
 			checkEnemyCollisions(this);
 
 			//actualizar posición
-			this.y += this.speed.y;
+			this.y += this.speed.y 
 			this.x += this.speed.x;
 		}
 	}
 	jump() {
 		//los saltos tienen un cooldown de 5 segundos a 10 segundos
-		if (this.onGround && frame - this.lastJumpFrameStamp > randomNumber(300, 600)) {
+		if (this.onGround && frame - this.lastJumpFrameStamp > randomNumber(600, 1800) * this.scale) {
 			//cada vez saltan con una fuerza aleatoria
-			this.speed.y -= randomNumber(15, 20);
+			this.speed.y -= randomNumber(10, 15) * this.scale;
 			//onground a false para que no puedan volver a saltar en el aire
 			this.onGround = false;
 			this.lastJumpFrameStamp = frame;
