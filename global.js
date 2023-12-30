@@ -346,11 +346,6 @@ function checkEnemyCollisions(enemy) {
 }
 
 function updateRecords() {
-	let tableRows = table.getElementsByTagName('tr')
-    while (tableRows.length > 1) {
-        table.removeChild(tableRows[1]);
-    }
-
 	//aqui obtenemos los records del localstorage
 	let recordsStorage = JSON.parse(localStorage.getItem("records")) || [];
 	//si no hay records en el localstorage no se añaden al array records
