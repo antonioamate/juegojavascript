@@ -1,32 +1,30 @@
 class Enemy {
 	constructor() {
-		this.scale=randomNumber(0.5,3)
 		this.goDown = false;
 		this.goDownTimestamp = 0;
 		this.lastJumpFrameStamp = 0;
 		this.beggingAudio;
 		this.agressive = true;
 		this.lastBite = 0;
-		this.health = 100 * this.scale;
+		this.health = 100;
 		this.dead = false;
 		this.deathTime = 0;
-		this.limitPain = randomNumber(10, 90) * this.scale;
+		this.limitPain = randomNumber(10, 90);
 		this.x = randomNumber(200, 1000);
 		this.y = 100;
-		this.width = 60 * this.scale;
-		this.height = 125 * this.scale;
-		this.damage=20*this.scale
+		this.width = 60;
+		this.height = 125;
 		this.image = new Image();
 		this.image.src = "./img/spriteenemy.png";
 		this.speed = {
 			x: 0,
 			y: 0,
 		};
-		this.acceleration = 1/this.scale
+		this.acceleration = randomNumber(0.5, 2);
 		this.animation = 0;
 		this.frame = 0;
 		this.onGround = true;
-		this.frameCooldown = 8 * this.scale;
+		this.frameCooldown = 8;
 	}
 
 	draw() {
@@ -38,8 +36,8 @@ class Enemy {
 			125,
 			this.x, //donde pone la imagen
 			this.y,
-			this.width, //dimensiones de la imagen a dibujar (dejarlo igual)
-			this.height
+			60, //dimensiones de la imagen a dibujar (dejarlo igual)
+			125
 		);
 	}
 
@@ -108,19 +106,19 @@ class Enemy {
 				}
 			}
 			//aplicar gravedad y comprobar colisoines
-			this.speed.y += gravity
+			this.speed.y += gravity;
 			checkEnemyCollisions(this);
 
 			//actualizar posición
-			this.y += this.speed.y 
+			this.y += this.speed.y;
 			this.x += this.speed.x;
 		}
 	}
 	jump() {
 		//los saltos tienen un cooldown de 5 segundos a 10 segundos
-		if (this.onGround && frame - this.lastJumpFrameStamp > randomNumber(600, 1800) * this.scale) {
+		if (this.onGround && frame - this.lastJumpFrameStamp > randomNumber(300, 600)) {
 			//cada vez saltan con una fuerza aleatoria
-			this.speed.y -= randomNumber(10, 15) * this.scale;
+			this.speed.y -= randomNumber(15, 20);
 			//onground a false para que no puedan volver a saltar en el aire
 			this.onGround = false;
 			this.lastJumpFrameStamp = frame;

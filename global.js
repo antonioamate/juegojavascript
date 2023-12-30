@@ -166,7 +166,7 @@ function checkPlayerEnemyCollisions() {
 			console.log("player got bite");
 			randomSound(playerHitSounds);
 			enemy.lastBite = frame;
-			player.health -= enemy.damage;
+			player.health -= 20;
 			//dependiendo de la posición del jugador con respecto al enemigo
 			//se empuja al jugador a la izquierda o la derecha y siempre un poco hacia arriba
 			if (player.x > enemy.x) {
@@ -346,6 +346,11 @@ function checkEnemyCollisions(enemy) {
 }
 
 function updateRecords() {
+	let tableRows = table.getElementsByTagName('tr')
+    while (tableRows.length > 1) {
+        table.removeChild(tableRows[1]);
+    }
+
 	//aqui obtenemos los records del localstorage
 	let recordsStorage = JSON.parse(localStorage.getItem("records")) || [];
 	//si no hay records en el localstorage no se añaden al array records
